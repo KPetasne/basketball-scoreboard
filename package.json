@@ -1,23 +1,40 @@
 {
   "name": "basketball-scoreboard",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A simple Express and React app to simulate a basketball scoreboard.",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/KPetasne/basketball-scoreboard.git"
+  "dependencies": {
+    "express": "^4.17.1",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.7.8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4"
   },
-  "keywords": [],
+  "engines": {
+    "node": ">=12.0.0"
+  },
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/KPetasne/basketball-scoreboard/issues"
-  },
-  "homepage": "https://github.com/KPetasne/basketball-scoreboard#readme",
-  "dependencies": {
-    "express": "^4.21.1"
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
