@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
+import ShotClock from './shotClock/shotClock';
 
 function App() {
     const [homeScore, setHomeScore] = useState(0);
@@ -71,6 +72,7 @@ function App() {
                 <div className="timer">
                     <h2>Time</h2>
                     <div>{formatTime(time)}</div>
+                    <ShotClock></ShotClock>
                 </div>
                 <div className="controls">
                     <button onClick={resetScores}>Reset</button>
