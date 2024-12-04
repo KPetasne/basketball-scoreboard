@@ -1,0 +1,9 @@
+.shot-clock {
+    display: inline-block;
+    margin: 10px 50px;
+}
+
+.shot-clock .score {
+    color: #09ff00d6;
+    font-size: 1rem;
+}
