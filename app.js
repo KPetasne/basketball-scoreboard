@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const port = 3000;
 
+let prueba = "hola";
 let homeScore = 0;
 let awayScore = 0;
 let matchTimer = null;
