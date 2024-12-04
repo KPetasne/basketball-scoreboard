@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const app = express();
 const port = 3000;
 
@@ -9,7 +10,7 @@ let matchTimer = null;
 let remainingTime = 600; // 10 minutes in seconds
 
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'build')));
 
 const updateTime = () => {
     if (remainingTime > 0) {
@@ -62,6 +63,10 @@ app.post('/stop-timer', (req, res) => {
 
 app.get('/time', (req, res) => {
     res.json({ time: remainingTime });
+});
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 app.listen(port, () => {
