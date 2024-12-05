@@ -1,0 +1,15 @@
+.team {
+    display: inline-block;
+    margin: 10px;
+}
+
+.team .name {
+    font-size: 1.5rem;
+    color: white;
+
+}
+
+.team .score {
+    color: #ff0000d6;
+    font-size: 2rem;
+}
