@@ -23,7 +23,6 @@ const ShotClock = () => {
   useEffect(() => {
     if (shotClock === 0) {
       setTimerRunning(false);
-      alert("Shot Clock Violation!");
     }
   }, [shotClock]);
 
