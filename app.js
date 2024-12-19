@@ -3,7 +3,7 @@ const path = require('path');
 const app = express();
 const routes = require('./routes/routes.js');
 const port = 3000;
-const pruebaoficina="hola";
+const pruebaoficina="holaychau";
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'build')));
