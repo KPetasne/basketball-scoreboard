@@ -6,28 +6,45 @@
   align-items: center;
   color: white;
   font-family: 'Orbitron', sans-serif;
+  width: 80%;
+}
+
+.board {
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+  display: flow;
 }
 
 .scoreboard {
-  text-align: center;
-  width: 80%;
-  background-color: black;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 1px 1px 20px 1px;
 }
 
-.score {
-  background-color: black;
-  padding: 5px;
-  border: 1px solid white;
-  font-weight: bold;
-  font-size: 1.5rem;   
-  width: 20%;
+.match {
+  width: 40%;
   display: inline-block;
 }
 
-.timer {
+.match .match-timer {
   margin: 10px;
-  display: block;
+  width: 200px;
+  display: inline-block;
+}
+
+.match .timer {
   color: red;
+  padding: 5px;
+  font-weight: bold;
+  font-size: 3.5rem;
+}
+
+.match .perpo {
+  display: row;
+  width: 100%;
 }
 
 .period{
@@ -35,8 +52,7 @@
     color: blue;
     font-size: 2rem;
     font-weight: bold;
-    margin: 10px 50px;
-    width: 30px;
+    width: 50%;
 }
 
 .posession{
@@ -44,13 +60,21 @@
   color: orange;
   font-size: 2rem;
   font-weight: bold;
-  width: 30px;
+  width: 25%;
 }
 
 .controller {
   text-align: center;
   background-color: grey;
   width: 100%;
+}
+
+.controls {
+  text-align: center;
+  background-color: grey;
+  width: 100%;
+  display: inline-flex;
+  justify-content: center;
 }
 
 .controls button, .team button {
@@ -68,21 +92,43 @@
   background-color: #61dafb;
 }
 
-.shot-clock {
+.timer-shot-clock {
   display: inline-block;
+  border: 1px solid white;
   margin: 15px 50px;
+  width: 150px;
+  height: 150px;
 }
 
-.shot-clock .score {
+.timer-shot-clock .shot-clock {
   color: #ff0000d6;
-  font-size: 1rem;
-  width: 50px;
+  font-size: 4rem;
+  font-weight: bold;
+}
+
+.timer-shot-clock .timer{
+  color: yellow;
+  font-size: 2rem;
+  font-weight: bold;
 }
 
 .finish {
-  color: #ff0000d6;
-  font-size: 1rem;
-  width: 50px;
-  border: 2px;
+  border: 3px;
   border-color: #ff0000d6;
 }
+
+.title {
+  font-size: 3rem;
+  color: white;
+  font-weight: bold;
+}  
+
+
+.sign {
+  font-size: 1.5rem;
+  color: white;
+  font-weight: bold;
+  align-items: right;
+  display: inline-block;
+  margin: 2px;
+}  

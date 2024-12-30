@@ -172,59 +172,65 @@ function App() {
 
     return (
         <div className="App">
-            <div className="scoreboard">
-                <h1>MADEKA SPORTS</h1>               
-                <div className="timer">
-                    <div className="score">{formatTime("timer", time)}</div>
-                </div>
-                <Team name='home' score={homeScore} controller={false} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts}></Team>              
-                <div>
-                    <div className="posession">{homePosession}</div>
-                    <div className="period">{period}</div>
-                    <div className="posession">{awayPosession}</div>
-                </div>
-                <Team name='away' score={awayScore} controller={false} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts}></Team>
-
-                <div>
-                    {/* <ShotClock controller={false}></ShotClock> */}
-                    <div className="shot-clock">
-                        <h2 className="score">{formatTime("shot-clock", shotClockTime)}</h2>
+            <div className="board">
+                <div className='title'>MADEKA SPORTS</div>
+                <div className="scoreboard">
+                    <Team name='home' score={homeScore} controller={false} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts}></Team>  
+                    <div className="match">
+                        <div className="match-timer">
+                            <div className="timer">{formatTime("timer", time)}</div>
+                        </div>
+                        <div className="perpo">
+                            <div className="posession">{homePosession}</div>
+                            <div className="period">{period}</div>
+                            <div className="posession">{awayPosession}</div>
+                        </div>
                     </div>
+                    <Team name='away' score={awayScore} controller={false} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts}></Team>
                 </div>
-                <h3>Powered by MDK SOLUTIONS</h3>    
+                <div className='sign'>Powered by MDK SOLUTIONS</div>
+            </div>
+            <div className="board">
+                <div className="timer-shot-clock">
+                    <div className="timer">{formatTime("timer", time)}</div>
+                    <div className="shot-clock">{formatTime("shot-clock", shotClockTime)}</div>
+                </div>
             </div>
             <div className="controller">
-            <h1>CONTROLLER</h1>
-                <div className="timer">
-                    <div className="score">{formatTime("timer", time)}</div>
-                </div>
-                <div className="controls">
-                    <button onClick={startTimer}>Start Timer</button>
-                    <button onClick={stopTimer}>Stop Timer</button>
-                </div>
-                <div className="controls">
-                    <Team name='home' score={homeScore} addPoints={addPoints} controller={true} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} postFouls={postFouls} postTimeOut={postTimeOut} postPosession={postPosession}></Team>              
-                    <div>
-                        <div className="posession">{homePosession}</div>
-                        <div className="period">{period}</div>
-                        <div className="posession">{awayPosession}</div>
-                        <button onClick={newPeriod}>New</button>
-                    </div>
-                    <Team name='away' score={awayScore} addPoints={addPoints} controller={true} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} postFouls={postFouls} postTimeOut={postTimeOut} postPosession={postPosession}></Team>
-                    <div>
-                        {/* <ShotClock controller={true}></ShotClock></div> */}
-                        <div className="shot-clock">
-                            <h2 className="score">{formatTime("shot-clock", shotClockTime)}</h2>
-                            <div>
-                            <button onClick={startShotClock}>Start</button>
-                            <button onClick={stopShotClock}>Stop</button>
-                            <button onClick={resetShotClock}>Reset 24</button>
-                            <button onClick={resetShotClockShort}>Reset 14</button>
+                <div className='title'>CONTROLLER</div>
+                <div className="scoreboard">
+                    <Team name='home' score={homeScore} addPoints={addPoints} controller={true} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} postFouls={postFouls} postTimeOut={postTimeOut} postPosession={postPosession}></Team>          
+                    <div className="match">
+                        <div className="match-timer">
+                            <div className="timer">{formatTime("timer", time)}</div>
+                        </div>
+                        <div className="controls">
+                            <button onClick={startTimer}>Start Timer</button>
+                            <button onClick={stopTimer}>Stop Timer</button>
+                        </div>
+                        <div className="perpo">
+                            <div className="posession">{homePosession}</div>
+                            <div className="period">{period}</div>
+                            <div className="posession">{awayPosession}</div>
+                        </div>
+                        <div className="controls">
+                            <button onClick={newPeriod}>New</button>
+                        </div>
+                        <div className="timer-shot-clock">
+                            <div className="timer">{formatTime("timer", time)}</div>
+                            <div className="shot-clock">{formatTime("shot-clock", shotClockTime)}</div>
+                            <div className="controls">
+                                <button onClick={startShotClock}>Start</button>
+                                <button onClick={stopShotClock}>Stop</button>
+                                <button onClick={resetShotClock}>Reset 24</button>
+                                <button onClick={resetShotClockShort}>Reset 14</button>
                             </div>
                         </div>
                     </div>
+                    <Team name='away' score={awayScore} addPoints={addPoints} controller={true} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} postFouls={postFouls} postTimeOut={postTimeOut} postPosession={postPosession}></Team>
                 </div>
-                <div><button onClick={resetScores}>Reset</button></div>
+                <div className='controls'><button onClick={resetScores}>Reset</button></div>
+                <div className='sign'>Powered by MDK SOLUTIONS</div>
             </div>
         </div>
     );
