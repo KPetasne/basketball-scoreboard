@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import './ShotClock.css'
 
-const ShotClock = () => {
-  const [shotClock, setShotClock] = useState(24);
+function ShotClock ({controller}){
+  const [shotClockTime, setShotClock] = useState(24);
   const [timerRunning, setTimerRunning] = useState(false);
 
   useEffect(() => {
     let timer;
-    if (timerRunning && shotClock > 0) {
+    if (timerRunning && shotClockTime > 0) {
       timer = setInterval(() => {
         setShotClock(prevShotClock => prevShotClock - 1);
       }, 1000);
     }
     return () => clearInterval(timer);
-  }, [timerRunning, shotClock]);
+  }, [timerRunning, shotClockTime]);
 
   const resetShotClock = () => {
     setShotClock(24);
@@ -21,19 +21,30 @@ const ShotClock = () => {
   };
 
   useEffect(() => {
-    if (shotClock === 0) {
+    if (shotClockTime === 0) {
       setTimerRunning(false);
     }
-  }, [shotClock]);
+  }, [shotClockTime]);
 
-  return (
-    <div className="shot-clock">
-      <h2 className="score">{shotClock}</h2>
-      <button onClick={() => setTimerRunning(true)}>Start</button>
-      <button onClick={() => setTimerRunning(false)}>Stop</button>
-      <button onClick={resetShotClock}>Reset</button>
-    </div>
-  );
+  if (controller == true) {
+    return (
+      <div className="shot-clock">
+        <h2 className="score">{shotClockTime}</h2>
+        <div>
+          <button onClick={() => setTimerRunning(true)}>Start</button>
+          <button onClick={() => setTimerRunning(false)}>Stop</button>
+          <button onClick={resetShotClock}>Reset 24</button>
+          <button onClick={resetShotClock}>Reset 14</button>
+        </div>
+      </div>
+    );
+  }else{
+    return (
+      <div className="shot-clock">
+        <h2 className="score">{shotClockTime}</h2>
+      </div>
+    );
+  }
 };
 
 export default ShotClock;

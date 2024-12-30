@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
 .App {
-  display: flex;
+  display: inline-block;
   justify-content: center;
   align-items: center;
   color: white;
@@ -11,6 +11,7 @@
 .scoreboard {
   text-align: center;
   width: 80%;
+  background-color: black;
 }
 
 .score {
@@ -18,11 +19,38 @@
   padding: 5px;
   border: 1px solid white;
   font-weight: bold;
+  font-size: 1.5rem;   
+  width: 20%;
+  display: inline-block;
 }
 
 .timer {
   margin: 10px;
   display: block;
+  color: red;
+}
+
+.period{
+    display: inline-block;
+    color: blue;
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 10px 50px;
+    width: 30px;
+}
+
+.posession{
+  display: inline-block;
+  color: orange;
+  font-size: 2rem;
+  font-weight: bold;
+  width: 30px;
+}
+
+.controller {
+  text-align: center;
+  background-color: grey;
+  width: 100%;
 }
 
 .controls button, .team button {
@@ -38,4 +66,23 @@
 
 .controls button:hover, .team button:hover {
   background-color: #61dafb;
+}
+
+.shot-clock {
+  display: inline-block;
+  margin: 15px 50px;
+}
+
+.shot-clock .score {
+  color: #ff0000d6;
+  font-size: 1rem;
+  width: 50px;
+}
+
+.finish {
+  color: #ff0000d6;
+  font-size: 1rem;
+  width: 50px;
+  border: 2px;
+  border-color: #ff0000d6;
 }
