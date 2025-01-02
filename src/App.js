@@ -35,7 +35,7 @@ function App() {
             fetchTimeOuts();
             fetchPeriod();
             fetchPosession();
-        }, 1000);
+        }, 100); // cada una decima de segundo actualiza la informacion
         return () => clearInterval(interval);
     }, []);
 

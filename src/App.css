@@ -6,7 +6,7 @@
   align-items: center;
   color: white;
   font-family: 'Orbitron', sans-serif;
-  width: 80%;
+  width: 100%;
 }
 
 .board {
@@ -15,6 +15,10 @@
   align-items: center;
   background-color: black;
   display: flow-root;
+}
+
+.board .timer-shot-clock{
+  width: 20%;
 }
 
 .scoreboard {
