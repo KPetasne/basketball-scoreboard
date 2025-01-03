@@ -18,7 +18,8 @@
 }
 
 .board .timer-shot-clock{
-  width: 20%;
+  width: 150px;
+  height: 150px;
 }
 
 .scoreboard {

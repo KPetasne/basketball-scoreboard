@@ -2,9 +2,47 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
 import Team from './team/Team';
-// import ShotClock from './shotClock/ShotClock';
+
+import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
+const domain = process.env.REACT_APP_AUTH0_DOMAIN || "dev-u3c555b5wr3ui240.us.auth0.com"; 
+const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID || "ABoNb46j1b4TRkNsuSK74tZEDQB9zlmn";
+
+//login
+const LoginButton = () => {
+    const { loginWithRedirect } = useAuth0();
+
+    return <button onClick={() => loginWithRedirect()}>Log In</button>;
+};
+const LogoutButton = () => {
+    const { logout } = useAuth0();
+
+    return (
+        <button onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}>
+        Log Out
+        </button>
+    );
+};
+const Profile = () => {
+    const { user, isAuthenticated, isLoading } = useAuth0();
+    if (isLoading) {
+    return <div>Loading ...</div>;
+    }
+    return (
+    isAuthenticated && (
+        <div>
+        <img src={user.picture} alt={user.name} />
+        <h2>{user.name}</h2>
+        <p>{user.email}</p>
+        </div>
+    )
+    );
+};
+//fin login
+
 
 function App() {
+    const { isAuthenticated, isLoading } = useAuth0(); if (isLoading) { return <div>Loading ...</div>; }
+    
     const [homeScore, setHomeScore] = useState(0);
     const [awayScore, setAwayScore] = useState(0);
     const [homeFouls, setHomeFouls] = useState(0);
@@ -171,69 +209,79 @@ function App() {
     };
 
     return (
+
         <div className="App">
-            <div className="board">
-                <div className='title'>MADEKA SPORTS</div>
-                <div className="scoreboard">
-                    <Team name='home' score={homeScore} controller={false} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts}></Team>  
-                    <div className="match">
-                        <div className="match-timer">
-                            <div className="timer">{formatTime("timer", time)}</div>
+            {!isAuthenticated ? ( 
+                <LoginButton /> 
+            ) : ( 
+                <> 
+                    <LogoutButton /> 
+                    <Profile />
+                    <div className="board">
+                        <div className='title'>MADEKA SPORTS</div>
+                        <div className="scoreboard">
+                            <Team name='home' score={homeScore} controller={false} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts}></Team>  
+                            <div className="match">
+                                <div className="match-timer">
+                                    <div className="timer">{formatTime("timer", time)}</div>
+                                </div>
+                                <div className="perpo">
+                                    <div className="posession">{homePosession}</div>
+                                    <div className="period">{period}</div>
+                                    <div className="posession">{awayPosession}</div>
+                                </div>
+                            </div>
+                            <Team name='away' score={awayScore} controller={false} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts}></Team>
                         </div>
-                        <div className="perpo">
-                            <div className="posession">{homePosession}</div>
-                            <div className="period">{period}</div>
-                            <div className="posession">{awayPosession}</div>
-                        </div>
+                        <div className='sign'>Powered by MDK SOLUTIONS</div>
                     </div>
-                    <Team name='away' score={awayScore} controller={false} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts}></Team>
-                </div>
-                <div className='sign'>Powered by MDK SOLUTIONS</div>
-            </div>
-            <div className="board">
-                <div className="timer-shot-clock">
-                    <div className="timer">{formatTime("timer", time)}</div>
-                    <div className="shot-clock">{formatTime("shot-clock", shotClockTime)}</div>
-                </div>
-            </div>
-            <div className="controller">
-                <div className='title'>CONTROLLER</div>
-                <div className="scoreboard">
-                    <Team name='home' score={homeScore} addPoints={addPoints} controller={true} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} postFouls={postFouls} postTimeOut={postTimeOut} postPosession={postPosession}></Team>          
-                    <div className="match">
-                        <div className="match-timer">
-                            <div className="timer">{formatTime("timer", time)}</div>
-                        </div>
-                        <div className="controls">
-                            <button onClick={startTimer}>Start Timer</button>
-                            <button onClick={stopTimer}>Stop Timer</button>
-                        </div>
-                        <div className="perpo">
-                            <div className="posession">{homePosession}</div>
-                            <div className="period">{period}</div>
-                            <div className="posession">{awayPosession}</div>
-                        </div>
-                        <div className="controls">
-                            <button onClick={newPeriod}>New</button>
-                        </div>
+                    <div className="board">
                         <div className="timer-shot-clock">
                             <div className="timer">{formatTime("timer", time)}</div>
                             <div className="shot-clock">{formatTime("shot-clock", shotClockTime)}</div>
-                            <div className="controls">
-                                <button onClick={startShotClock}>Start</button>
-                                <button onClick={stopShotClock}>Stop</button>
-                                <button onClick={resetShotClock}>Reset 24</button>
-                                <button onClick={resetShotClockShort}>Reset 14</button>
-                            </div>
                         </div>
                     </div>
-                    <Team name='away' score={awayScore} addPoints={addPoints} controller={true} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} postFouls={postFouls} postTimeOut={postTimeOut} postPosession={postPosession}></Team>
-                </div>
-                <div className='controls'><button onClick={resetScores}>Reset</button></div>
-                <div className='sign'>Powered by MDK SOLUTIONS</div>
-            </div>
+                    <div className="controller">
+                        <div className='title'>CONTROLLER</div>
+                        <div className="scoreboard">
+                            <Team name='home' score={homeScore} addPoints={addPoints} controller={true} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} postFouls={postFouls} postTimeOut={postTimeOut} postPosession={postPosession}></Team>          
+                            <div className="match">
+                                <div className="match-timer">
+                                    <div className="timer">{formatTime("timer", time)}</div>
+                                </div>
+                                <div className="controls">
+                                    <button onClick={startTimer}>Start Timer</button>
+                                    <button onClick={stopTimer}>Stop Timer</button>
+                                </div>
+                                <div className="perpo">
+                                    <div className="posession">{homePosession}</div>
+                                    <div className="period">{period}</div>
+                                    <div className="posession">{awayPosession}</div>
+                                </div>
+                                <div className="controls">
+                                    <button onClick={newPeriod}>New</button>
+                                </div>
+                                <div className="timer-shot-clock">
+                                    <div className="timer">{formatTime("timer", time)}</div>
+                                    <div className="shot-clock">{formatTime("shot-clock", shotClockTime)}</div>
+                                    <div className="controls">
+                                        <button onClick={startShotClock}>Start</button>
+                                        <button onClick={stopShotClock}>Stop</button>
+                                        <button onClick={resetShotClock}>Reset 24</button>
+                                        <button onClick={resetShotClockShort}>Reset 14</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <Team name='away' score={awayScore} addPoints={addPoints} controller={true} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} postFouls={postFouls} postTimeOut={postTimeOut} postPosession={postPosession}></Team>
+                        </div>
+                        <div className='controls'><button onClick={resetScores}>Reset</button></div>
+                        <div className='sign'>Powered by MDK SOLUTIONS</div>
+                    </div>
+                </> 
+            )}
         </div>
     );
 }
+const Auth0App = () => ( <Auth0Provider domain={domain} clientId={clientId} authorizationParams={{ redirect_uri: window.location.origin }} > <App /> </Auth0Provider> ); 
 
-export default App;
+export default Auth0App;
