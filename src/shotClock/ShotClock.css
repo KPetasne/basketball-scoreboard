@@ -1,10 +1,19 @@
-.shot-clock {
+.timer-shot-clock {
     display: inline-block;
+    border: 1px solid white;
     margin: 15px 50px;
-}
-
-.shot-clock .score {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .timer-shot-clock .shot-clock {
     color: #ff0000d6;
-    font-size: 1rem;
-    width: 50px;
-}
+    font-size: 4rem;
+    font-weight: bold;
+  }
+  
+  .timer-shot-clock .timer{
+    color: yellow;
+    font-size: 2rem;
+    font-weight: bold;
+  }

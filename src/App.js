@@ -2,78 +2,46 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
 import Team from './team/Team';
+import ShotClock from './shotClock/shotClock.js';
+import {LoginButton,LogoutButton,Profile} from './log/log.js';
 
 import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
 const domain = process.env.REACT_APP_AUTH0_DOMAIN || "dev-u3c555b5wr3ui240.us.auth0.com"; 
 const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID || "ABoNb46j1b4TRkNsuSK74tZEDQB9zlmn";
 
-//login
-const LoginButton = () => {
-    const { loginWithRedirect } = useAuth0();
-
-    return <button onClick={() => loginWithRedirect()}>Log In</button>;
-};
-const LogoutButton = () => {
-    const { logout } = useAuth0();
-
-    return (
-        <button onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}>
-        Log Out
-        </button>
-    );
-};
-const Profile = () => {
-    const { user, isAuthenticated, isLoading } = useAuth0();
-    if (isLoading) {
-    return <div>Loading ...</div>;
-    }
-    return (
-    isAuthenticated && (
-        <div>
-        <img src={user.picture} alt={user.name} />
-        <h2>{user.name}</h2>
-        <p>{user.email}</p>
-        </div>
-    )
-    );
-};
-//fin login
-
 
 function App() {
     const { isAuthenticated, isLoading } = useAuth0(); if (isLoading) { return <div>Loading ...</div>; }
-    
+    const TEN_MINUTES = 600000;
+    const ONE_SECOND = 1000;
+    const INTERVAL_MS = 100;
     const [homeScore, setHomeScore] = useState(0);
     const [awayScore, setAwayScore] = useState(0);
     const [homeFouls, setHomeFouls] = useState(0);
     const [awayFouls, setAwayFouls] = useState(0);
     const [homeTimeOuts, setHomeTimeOuts] = useState(2);
     const [awayTimeOuts, setAwayTimeOuts] = useState(2);
-    const [time, setTime] = useState(600000); // 60000 = 10 minutos
+    const [time, setTime] = useState(TEN_MINUTES); // 600000 = 10 minutos
     const [shotClockTime, setShotClock] = useState(24000);
-    const [timerRunning, setTimerRunning] = useState(false);
-    const [period, setPeriod] = useState(1); // 60000 = 10 min
-    const [posession, setPosession] = useState(null); // 60000 = 10 min
+    const [period, setPeriod] = useState(1);
+    const [posession, setPosession] = useState(null); 
     const [homePosession, setHomePosession] = useState(null);
     const [awayPosession, setAwayPosession] = useState(null);
+    const [board, setBoard] = useState(0);
 
     useEffect(() => {
-        fetchScore();
-        fetchTime();
-        fetchShotClock();
-        fetchFouls();
-        fetchTimeOuts();
-        fetchPeriod();
-        fetchPosession();
+        const fetchAllData = async () => {
+            await fetchScore();
+            await fetchTime();
+            await fetchShotClock();
+            await fetchFouls();
+            await fetchTimeOuts();
+            await fetchPeriod();
+            await fetchPosession();
+        };
         const interval = setInterval(() => {
-            fetchScore();
-            fetchTime();
-            fetchShotClock();
-            fetchFouls();
-            fetchTimeOuts();
-            fetchPeriod();
-            fetchPosession();
-        }, 100); // cada una decima de segundo actualiza la informacion
+            fetchAllData();
+        }, INTERVAL_MS); // cada una decima de segundo actualiza la informacion
         return () => clearInterval(interval);
     }, []);
 
@@ -122,23 +90,14 @@ function App() {
 
     const resetScores = async () => {
         await axios.post('/reset');
-        fetchScore();
-        fetchTime();
-        fetchShotClock();
-        fetchFouls();
-        fetchTimeOuts();
-        fetchPeriod();
-        fetchPosession();
     };
 
     const startTimer = async () => {
         await axios.post('/start-timer');
-        startShotClock();
     };
 
     const stopTimer = async () => {
         await axios.post('/stop-timer');
-        stopShotClock();
     };
 
     const addPoints = async (team, points) => {
@@ -149,24 +108,6 @@ function App() {
     const fetchShotClock = async () => {
         const response = await axios.get('/shot-clock');
         setShotClock(response.data.shotClockTime);
-    };
-
-    const startShotClock = async () => {
-        await axios.post('/start-shot-clock');
-        setTimerRunning(true);
-    };
-
-    const stopShotClock = async () => {
-        await axios.post('/stop-shot-clock');
-        setTimerRunning(false);
-    };
-
-    const resetShotClock = async () => {
-        await axios.post('/reset-shot-clock');
-    };
-
-    const resetShotClockShort = async () => {
-        await axios.post('/reset-shot-clock-short');
     };
 
     const newPeriod = async () => {
@@ -192,21 +133,19 @@ function App() {
     const formatTime = (timer, time) => {
         const minutes = Math.floor(time / 60000);
         const seconds = Math.floor((time % 60000) / 1000); // Obtener segundos en el formato correcto
-        const secondsdeci = time / 1000;
+        const secondsdeci = (time / 1000).toFixed(1);
         if (timer === "timer"){
-            if (time >= 10000){
+            if (time >= 60000){
                 return `${minutes.toString().padStart(1, '0')}:${seconds.toString().padStart(2, '0')}`; // Asegurarse de que minutos tienen un carácter
-            } else {
-                return `${secondsdeci}`;
-            }
-        }else{
-            if (time >= 3000){
-                return `${seconds.toString().padStart(2, '0')}`;
             } else {
                 return `${secondsdeci}`;
             }
         }
     };
+
+    // const boardType = (b) => {
+    //     setBoard("board-"+b);
+    // }
 
     return (
 
@@ -217,7 +156,9 @@ function App() {
                 <> 
                     <LogoutButton /> 
                     <Profile />
-                    <div className="board">
+                    {/* <button onClick={boardType(1)}>Board 1</button>
+                    <button onClick={boardType(2)}>Board 2</button> */}
+                    <div className="board {board}">
                         <div className='title'>MADEKA SPORTS</div>
                         <div className="scoreboard">
                             <Team name='home' score={homeScore} controller={false} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts}></Team>  
@@ -236,10 +177,11 @@ function App() {
                         <div className='sign'>Powered by MDK SOLUTIONS</div>
                     </div>
                     <div className="board">
-                        <div className="timer-shot-clock">
-                            <div className="timer">{formatTime("timer", time)}</div>
-                            <div className="shot-clock">{formatTime("shot-clock", shotClockTime)}</div>
-                        </div>
+                        <ShotClock name='shot-clock'                         
+                            shotClockTime={shotClockTime}
+                            timer={time} 
+                            controller={false}
+                        />
                     </div>
                     <div className="controller">
                         <div className='title'>CONTROLLER</div>
@@ -261,16 +203,11 @@ function App() {
                                 <div className="controls">
                                     <button onClick={newPeriod}>New</button>
                                 </div>
-                                <div className="timer-shot-clock">
-                                    <div className="timer">{formatTime("timer", time)}</div>
-                                    <div className="shot-clock">{formatTime("shot-clock", shotClockTime)}</div>
-                                    <div className="controls">
-                                        <button onClick={startShotClock}>Start</button>
-                                        <button onClick={stopShotClock}>Stop</button>
-                                        <button onClick={resetShotClock}>Reset 24</button>
-                                        <button onClick={resetShotClockShort}>Reset 14</button>
-                                    </div>
-                                </div>
+                                <ShotClock
+                                    shotClockTime={shotClockTime} 
+                                    timer={time}
+                                    controller={true}
+                                />
                             </div>
                             <Team name='away' score={awayScore} addPoints={addPoints} controller={true} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} postFouls={postFouls} postTimeOut={postTimeOut} postPosession={postPosession}></Team>
                         </div>

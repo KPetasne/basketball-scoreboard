@@ -1,3 +1,5 @@
+// const timer = require('../service/timer.js');
+
 let homeScore = 0;
 let awayScore = 0;
 let homeFouls = 0;
@@ -19,6 +21,8 @@ const updateTime = () => {
     } else {
         clearInterval(matchTimer);
         matchTimer = null;
+        clearInterval(shotClockTimer);
+        shotClockTimer = null;
     }
 };
 
@@ -26,8 +30,10 @@ const updateShotClock = () => {
     if (shotClockTime > 0) {
         shotClockTime -= 100;
     } else {
-        clearInterval(shotClockTimer);
-        shotClockTimer = null;
+        if (!matchTimer) {
+            clearInterval(shotClockTimer);
+            shotClockTimer = null;
+        }
     }
 };
 
@@ -122,14 +128,36 @@ const stopShotClock = (req, res) => {
         clearInterval(shotClockTimer);
         shotClockTimer = null;
     }
+    if (matchTimer) {
+        clearInterval(matchTimer);
+        matchTimer = null;
+    }
     res.json({ shotClockTime: shotClockTime });
 }
 const resetShotClock = (req, res) => {
-    shotClockTime = 24000;
+    if (remainingTime <= 24000) {
+        clearInterval(shotClockTimer);
+        shotClockTimer = null;
+        shotClockTime = "-1";
+    } else {
+        shotClockTime = 24000;
+        if (!shotClockTimer && matchTimer) {
+            shotClockTimer = setInterval(updateShotClock, 100);
+        }
+    }
     res.json({ shotClockTime: shotClockTime });
 }
 const resetShotClockShort = (req, res) => {
-    shotClockTime = 14000;
+    if (remainingTime <= 14000) {
+        clearInterval(shotClockTimer);
+        shotClockTimer = null;
+        shotClockTime = "-1";
+    } else {
+        shotClockTime = 14000;
+        if (!shotClockTimer && matchTimer) {
+            shotClockTimer = setInterval(updateShotClock, 100);
+        }
+    }
     res.json({ shotClockTime: shotClockTime });
 }
 
