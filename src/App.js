@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
-import Team from './team/Team';
-import ShotClock from './shotClock/shotClock.js';
+import Team from './match/team/Team.js';
+import ShotClock from './match/shotClock/shotClock.js';
+import GameTimer from './match/gameTimer.js';
+import GamePeriod from './match/gamePeriod.js';
+import GamePosession from './match/gamePosession.js';
+import { TEN_MINUTES, ONE_MINUTE,LONG_SHOTCLOCK,SHORT_SHOTCLOCK, FIVE_SECOND,ONE_SECOND,INTERVAL_MS } from './match/gameConstants.js';
 import {LoginButton,LogoutButton,Profile} from './log/log.js';
 
 import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
@@ -12,9 +16,6 @@ const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID || "ABoNb46j1b4TRkNsuSK74
 
 function App() {
     const { isAuthenticated, isLoading } = useAuth0(); if (isLoading) { return <div>Loading ...</div>; }
-    const TEN_MINUTES = 600000;
-    const ONE_SECOND = 1000;
-    const INTERVAL_MS = 100;
     const [homeScore, setHomeScore] = useState(0);
     const [awayScore, setAwayScore] = useState(0);
     const [homeFouls, setHomeFouls] = useState(0);
@@ -92,60 +93,10 @@ function App() {
         await axios.post('/reset');
     };
 
-    const startTimer = async () => {
-        await axios.post('/start-timer');
-    };
-
-    const stopTimer = async () => {
-        await axios.post('/stop-timer');
-    };
-
-    const addPoints = async (team, points) => {
-        await axios.post('/score', { team, points });
-        fetchScore();
-    };
-
     const fetchShotClock = async () => {
         const response = await axios.get('/shot-clock');
         setShotClock(response.data.shotClockTime);
     };
-
-    const newPeriod = async () => {
-        await axios.post('/period');
-        fetchPeriod();
-    };
-
-    const postPosession = async (team, posession) => {
-        await axios.post('/posession', { team, posession });
-        fetchPosession();
-    };
-
-    const postTimeOut = async (team, timeOut) => {
-        await axios.post('/time-outs', { team, timeOut });
-        fetchTimeOuts();
-    };
-
-    const postFouls = async (team, fouls) => {
-        await axios.post('/fouls', { team, fouls });
-        fetchFouls();
-    };
-
-    const formatTime = (timer, time) => {
-        const minutes = Math.floor(time / 60000);
-        const seconds = Math.floor((time % 60000) / 1000); // Obtener segundos en el formato correcto
-        const secondsdeci = (time / 1000).toFixed(1);
-        if (timer === "timer"){
-            if (time >= 60000){
-                return `${minutes.toString().padStart(1, '0')}:${seconds.toString().padStart(2, '0')}`; // Asegurarse de que minutos tienen un carácter
-            } else {
-                return `${secondsdeci}`;
-            }
-        }
-    };
-
-    // const boardType = (b) => {
-    //     setBoard("board-"+b);
-    // }
 
     return (
 
@@ -161,18 +112,16 @@ function App() {
                     <div className="board {board}">
                         <div className='title'>MADEKA SPORTS</div>
                         <div className="scoreboard">
-                            <Team name='home' score={homeScore} controller={false} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts}></Team>  
+                            <Team name='home' score={homeScore} fetchScore={fetchScore} controller={false} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts}></Team>  
                             <div className="match">
-                                <div className="match-timer">
-                                    <div className="timer">{formatTime("timer", time)}</div>
-                                </div>
+                                <GameTimer controller={false} time={time} fetchTime={fetchTime}></GameTimer>
                                 <div className="perpo">
-                                    <div className="posession">{homePosession}</div>
-                                    <div className="period">{period}</div>
-                                    <div className="posession">{awayPosession}</div>
+                                    <GamePosession controller="home" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
+                                    <GamePeriod controller={false} fetchPeriod={fetchPeriod} period={period}></GamePeriod>
+                                    <GamePosession controller="away" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
                                 </div>
                             </div>
-                            <Team name='away' score={awayScore} controller={false} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts}></Team>
+                            <Team name='away' score={awayScore} fetchScore={fetchScore}  controller={false} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts}></Team>
                         </div>
                         <div className='sign'>Powered by MDK SOLUTIONS</div>
                     </div>
@@ -186,22 +135,13 @@ function App() {
                     <div className="controller">
                         <div className='title'>CONTROLLER</div>
                         <div className="scoreboard">
-                            <Team name='home' score={homeScore} addPoints={addPoints} controller={true} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} postFouls={postFouls} postTimeOut={postTimeOut} postPosession={postPosession}></Team>          
+                            <Team name='home' score={homeScore} fetchScore={fetchScore} controller={true} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} fetchFouls={fetchFouls} fetchTimeOut={fetchTimeOuts} fetchPosession={fetchPosession}></Team>          
                             <div className="match">
-                                <div className="match-timer">
-                                    <div className="timer">{formatTime("timer", time)}</div>
-                                </div>
-                                <div className="controls">
-                                    <button onClick={startTimer}>Start Timer</button>
-                                    <button onClick={stopTimer}>Stop Timer</button>
-                                </div>
+                                <GameTimer controller={true} time={time} fetchTime={fetchTime}></GameTimer>
                                 <div className="perpo">
-                                    <div className="posession">{homePosession}</div>
-                                    <div className="period">{period}</div>
-                                    <div className="posession">{awayPosession}</div>
-                                </div>
-                                <div className="controls">
-                                    <button onClick={newPeriod}>New</button>
+                                    <GamePosession controller="home" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
+                                    <GamePeriod controller={true} fetchPeriod={fetchPeriod} period={period}></GamePeriod>
+                                    <GamePosession controller="away" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
                                 </div>
                                 <ShotClock
                                     shotClockTime={shotClockTime} 
@@ -209,7 +149,7 @@ function App() {
                                     controller={true}
                                 />
                             </div>
-                            <Team name='away' score={awayScore} addPoints={addPoints} controller={true} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} postFouls={postFouls} postTimeOut={postTimeOut} postPosession={postPosession}></Team>
+                            <Team name='away' score={awayScore} fetchScore={fetchScore} controller={true} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} fetchFouls={fetchFouls} fetchTimeOut={fetchTimeOuts} fetchPosession={fetchPosession}></Team>
                         </div>
                         <div className='controls'><button onClick={resetScores}>Reset</button></div>
                         <div className='sign'>Powered by MDK SOLUTIONS</div>

@@ -1,5 +1,20 @@
-// const timer = require('../service/timer.js');
+// import { getScore, postScore } from '../services/scoreService.js';
+// import { reset } from '../services/resetService.js';
+// import { startTimer, stopTimer, getTime } from '../services/timerService.js';
+// import { getShotClock, startShotClock, stopShotClock, resetShotClock, resetShotClockShort } from '../services/shotClockService.js';
+// import { getFoul, postFoul } from '../services/foulService.js';
+// import { getTimeOut, postTimeOut } from '../services/timeOutService.js';
+// import { getPeriod, postPeriod } from '../services/periodService.js';
+// import { getPosession, postPosession } from '../services/posessionService.js';
 
+// const timer = require('../services/timer.js');
+// const TEN_MINUTES = 600000;
+// const ONE_MINUTE = 60000;
+// const LONG_SHOTCLOCK = 24000;
+// const SHORT_SHOTCLOCK = 14000;
+// const FIVE_SECOND = 5000;
+// const ONE_SECOND = 1000;
+// const INTERVAL_MS = 100;
 let homeScore = 0;
 let awayScore = 0;
 let homeFouls = 0;

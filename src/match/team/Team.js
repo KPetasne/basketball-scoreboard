@@ -1,12 +1,33 @@
 import React from 'react';
-import './Team.css'
+import axios from 'axios';
+import './Team.css';
 
-function Team({ name, score, addPoints, controller, homeTeam, fouls, timeOuts, postFouls, postTimeOut, postPosession }) {
+function Team({ name, score, fetchScore, controller, homeTeam, fouls, timeOuts, fetchFouls, fetchTimeOuts, fetchPosession }) {
 
     const teamName = () => {
         return name.toUpperCase();
     }
     
+    const addPoints = async (team, points) => {
+        await axios.post('/score', { team, points });
+        fetchScore();
+    };
+
+    const postPosession = async (team, posession) => {
+        await axios.post('/posession', { team, posession });
+        fetchPosession();
+    };
+
+    const postTimeOut = async (team, timeOut) => {
+        await axios.post('/time-outs', { team, timeOut });
+        fetchTimeOuts();
+    };
+
+    const postFouls = async (team, fouls) => {
+        await axios.post('/fouls', { team, fouls });
+        fetchFouls();
+    };
+
     return (
         <div className="team-container">
             <div className='name'>{teamName()}</div>
