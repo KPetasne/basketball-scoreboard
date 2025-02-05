@@ -24,6 +24,7 @@ const ShotClock = ({ shotClockTime, fetchShotClock, timer, controller }) => {
 
     const stopShotClock = async () => {
         await axios.post('/stop-shot-clock');
+        await axios.post('/stop-timer');
         setTimerRunning(false);
     };
 

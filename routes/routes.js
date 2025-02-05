@@ -11,8 +11,6 @@ router.get('/score', board.getScore);
 
 router.post('/score', board.postScore);
 
-router.post('/reset', board.reset);
-
 router.post('/start-timer', board.startTimer);
 
 router.post('/stop-timer', board.stopTimer);
@@ -44,5 +42,21 @@ router.post('/fouls', board.postFoul);
 router.get('/time-outs', board.getTimeOut);
 
 router.post('/time-outs', board.postTimeOut);
+
+router.post('/reset', board.reset);
+
+// router.post('/reset-score', board.resetScore);
+
+// router.post('/reset-shot-clock-default', board.resetShotClockDefault);
+
+// router.post('/reset-timer', board.resetTimer);
+
+// router.post('/reset-period', board.resetPeriod);
+
+// router.post('/reset-posession', board.resetPosession);
+
+// router.post('/reset-foul', board.resetFoul);
+
+// router.post('/reset-time-outs', board.resetTimeOut);
 
 module.exports = router;

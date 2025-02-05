@@ -4,6 +4,12 @@ import { shotClockTimer, updateShotClock, shotClockTime } from './shotClockServi
 let matchTimer = null;
 let remainingTime = TEN_MINUTES; // 10 minutos
 
+// const resetTimer = () => {
+//     matchTimer = null;
+//     remainingTime = TEN_MINUTES; // 10 minutos
+//     res.json({ time: remainingTime });
+// };
+
 const updateTime = () => {
     if (remainingTime > 0) {
         remainingTime -= INTERVAL_MS;
@@ -23,25 +29,23 @@ const startTimer = (req, res) => {
         shotClockTimer = setInterval(updateShotClock, INTERVAL_MS);
     }
     res.json({ time: remainingTime, shotClockTime: shotClockTime });
-}
+};
 
 const stopTimer = (req, res) => {
     if (matchTimer) {
         clearInterval(matchTimer);
         matchTimer = null;
     }
-    if (shotClockTimer) {
-        clearInterval(shotClockTimer);
-        shotClockTimer = null;
-    }
-    res.json({ time: remainingTime, shotClockTime: shotClockTime });
-}
+    res.json({ time: remainingTime });
+};
 
 const getTime = (req, res) => {
     res.json({ time: remainingTime });
-}
+};
 
 export  {
+    // resetTimer,
+    updateTime,
     startTimer,
     stopTimer,
     getTime,

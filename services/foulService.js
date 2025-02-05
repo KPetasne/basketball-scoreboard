@@ -1,9 +1,15 @@
 let homeFouls = 0;
 let awayFouls = 0;
 
+// const resetFoul = () => {
+//     homeFouls = 0;
+//     awayFouls = 0;
+//     res.json({ homeFouls, awayFouls });
+// };
+
 const getFoul = (req, res) => {
     res.json({ homeFouls, awayFouls });
-}
+};
 
 const postFoul = (req, res) => {
     const { team, fouls } = req.body;
@@ -21,9 +27,12 @@ const postFoul = (req, res) => {
         }
     }
     res.json({ homeFouls, awayFouls });
-}
+};
 
 export {
+    // resetFoul,
     getFoul,
     postFoul,
+    homeFouls,
+    awayFouls
 };

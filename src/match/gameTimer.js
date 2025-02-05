@@ -21,6 +21,7 @@ const GameTimer = ({ controller, time, fetchTime }) => {
 
     const stopTimer = async () => {
         await axios.post('/stop-timer');
+        await axios.post('/stop-shot-clock');
     };
 
     const formatTime = (time) => {

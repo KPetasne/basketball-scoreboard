@@ -1,8 +1,16 @@
+import { clear } from '@testing-library/user-event/dist/clear.js';
 import { INTERVAL_MS, LONG_SHOTCLOCK, SHORT_SHOTCLOCK } from './constants.js';
 import { matchTimer,remainingTime } from './timerService.js';
 
 let shotClockTime = LONG_SHOTCLOCK;
 let shotClockTimer = null;
+
+// const resetShotClockDefault = () => {
+//     shotClockTime = LONG_SHOTCLOCK;
+//     shotClockTimer = null;
+//     clearInterval(shotClockTimer);
+//     res.json({ shotClockTime: shotClockTime });
+// };
 
 const updateShotClock = () => {
     if (shotClockTime > 0) {
@@ -16,27 +24,23 @@ const updateShotClock = () => {
 };
 
 const getShotClock = (req, res) => {
-    res.json({ shotClockTime });
-}
+    res.json({ shotClockTime: shotClockTime });
+};
 
 const startShotClock = (req, res) => {
     if (!shotClockTimer) {
         shotClockTimer = setInterval(updateShotClock, INTERVAL_MS);
     }
-    res.json({ shotClockTime });
-}
+    res.json({ shotClockTime: shotClockTime });
+};
 
 const stopShotClock = (req, res) => {
     if (shotClockTimer) {
         clearInterval(shotClockTimer);
         shotClockTimer = null;
     }
-    if (matchTimer) {
-        clearInterval(matchTimer);
-        matchTimer = null;
-    }
     res.json({ shotClockTime: shotClockTime });
-}
+};
 
 const resetShotClock = (req, res) => {
     if (remainingTime <= LONG_SHOTCLOCK) {
@@ -50,7 +54,8 @@ const resetShotClock = (req, res) => {
         }
     }
     res.json({ shotClockTime: shotClockTime });
-}
+};
+
 const resetShotClockShort = (req, res) => {
     if (remainingTime <= SHORT_SHOTCLOCK) {
         clearInterval(shotClockTimer);
@@ -63,9 +68,10 @@ const resetShotClockShort = (req, res) => {
         }
     }
     res.json({ shotClockTime: shotClockTime });
-}
+};
 
 export  {
+    // resetShotClockDefault,
     getShotClock,
     startShotClock,
     stopShotClock,

@@ -17,9 +17,12 @@
   display: flow-root;
 }
 
-.board .timer-shot-clock{
-  width: 150px;
-  height: 150px;
+.board-shot-clock{
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+  display: flow-root;
 }
 
 .scoreboard {

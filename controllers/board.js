@@ -1,20 +1,12 @@
 // import { getScore, postScore } from '../services/scoreService.js';
-// import { reset } from '../services/resetService.js';
-// import { startTimer, stopTimer, getTime } from '../services/timerService.js';
-// import { getShotClock, startShotClock, stopShotClock, resetShotClock, resetShotClockShort } from '../services/shotClockService.js';
+// import { updateTime, startTimer, stopTimer, getTime } from '../services/timerService.js';
+// import { updateShotClock, getShotClock, startShotClock, stopShotClock, resetShotClock, resetShotClockShort } from '../services/shotClockService.js';
 // import { getFoul, postFoul } from '../services/foulService.js';
 // import { getTimeOut, postTimeOut } from '../services/timeOutService.js';
 // import { getPeriod, postPeriod } from '../services/periodService.js';
 // import { getPosession, postPosession } from '../services/posessionService.js';
+import {TEN_MINUTES,ONE_MINUTE,LONG_SHOTCLOCK,SHORT_SHOTCLOCK,FIVE_SECOND,ONE_SECOND,INTERVAL_MS } from '../services/constants.js';
 
-// const timer = require('../services/timer.js');
-// const TEN_MINUTES = 600000;
-// const ONE_MINUTE = 60000;
-// const LONG_SHOTCLOCK = 24000;
-// const SHORT_SHOTCLOCK = 14000;
-// const FIVE_SECOND = 5000;
-// const ONE_SECOND = 1000;
-// const INTERVAL_MS = 100;
 let homeScore = 0;
 let awayScore = 0;
 let homeFouls = 0;
@@ -26,13 +18,13 @@ let awayPosession = false;
 let period = 1;
 let posession = null;
 let matchTimer = null;
-let remainingTime = 600000; // 600 = 10 minutes in seconds
-let shotClockTime = 24000;
+let remainingTime = TEN_MINUTES; // 600 = 10 minutes in seconds
+let shotClockTime = LONG_SHOTCLOCK;
 let shotClockTimer = null;
 
 const updateTime = () => {
     if (remainingTime > 0) {
-        remainingTime -= 100;
+        remainingTime -= INTERVAL_MS;
     } else {
         clearInterval(matchTimer);
         matchTimer = null;
@@ -43,7 +35,7 @@ const updateTime = () => {
 
 const updateShotClock = () => {
     if (shotClockTime > 0) {
-        shotClockTime -= 100;
+        shotClockTime -= INTERVAL_MS;
     } else {
         if (!matchTimer) {
             clearInterval(shotClockTimer);
@@ -89,12 +81,12 @@ const reset = (req, res) => {
     awayPosession = false;
     period = 1;
     posession = null;
-    remainingTime = 600000; // resetear a lo que se indique por default 60000 = 10 minutos
+    remainingTime = TEN_MINUTES; // resetear a lo que se indique por default 60000 = 10 minutos
     if (matchTimer) {
         clearInterval(matchTimer);
         matchTimer = null;
     }
-    shotClockTime = 24000;
+    shotClockTime = LONG_SHOTCLOCK;
     if (shotClockTimer) {
         clearInterval(shotClockTimer);
         shotClockTimer = null;
@@ -104,10 +96,10 @@ const reset = (req, res) => {
 
 const startTimer = (req, res) => {
     if (!matchTimer) {
-        matchTimer = setInterval(updateTime, 100);
+        matchTimer = setInterval(updateTime, INTERVAL_MS);
     }
     if (!shotClockTimer) {
-        shotClockTimer = setInterval(updateShotClock, 100);
+        shotClockTimer = setInterval(updateShotClock, INTERVAL_MS);
     }
     res.json({ time: remainingTime, shotClockTime: shotClockTime });
 }
@@ -117,11 +109,7 @@ const stopTimer = (req, res) => {
         clearInterval(matchTimer);
         matchTimer = null;
     }
-    if (shotClockTimer) {
-        clearInterval(shotClockTimer);
-        shotClockTimer = null;
-    }
-    res.json({ time: remainingTime, shotClockTime: shotClockTime });
+    res.json({ time: remainingTime });
 }
 
 const getTime = (req, res) => {
@@ -133,7 +121,7 @@ const getShotClock = (req, res) => {
 }
 const startShotClock = (req, res) => {
     if (!shotClockTimer) {
-        shotClockTimer = setInterval(updateShotClock, 100);
+        shotClockTimer = setInterval(updateShotClock, INTERVAL_MS);
     }
     res.json({ shotClockTime: shotClockTime });
 }
@@ -143,34 +131,30 @@ const stopShotClock = (req, res) => {
         clearInterval(shotClockTimer);
         shotClockTimer = null;
     }
-    if (matchTimer) {
-        clearInterval(matchTimer);
-        matchTimer = null;
-    }
     res.json({ shotClockTime: shotClockTime });
 }
 const resetShotClock = (req, res) => {
-    if (remainingTime <= 24000) {
+    if (remainingTime <= LONG_SHOTCLOCK) {
         clearInterval(shotClockTimer);
         shotClockTimer = null;
         shotClockTime = "-1";
     } else {
-        shotClockTime = 24000;
+        shotClockTime = LONG_SHOTCLOCK;
         if (!shotClockTimer && matchTimer) {
-            shotClockTimer = setInterval(updateShotClock, 100);
+            shotClockTimer = setInterval(updateShotClock, INTERVAL_MS);
         }
     }
     res.json({ shotClockTime: shotClockTime });
 }
 const resetShotClockShort = (req, res) => {
-    if (remainingTime <= 14000) {
+    if (remainingTime <= SHORT_SHOTCLOCK) {
         clearInterval(shotClockTimer);
         shotClockTimer = null;
         shotClockTime = "-1";
     } else {
-        shotClockTime = 14000;
+        shotClockTime = SHORT_SHOTCLOCK;
         if (!shotClockTimer && matchTimer) {
-            shotClockTimer = setInterval(updateShotClock, 100);
+            shotClockTimer = setInterval(updateShotClock, INTERVAL_MS);
         }
     }
     res.json({ shotClockTime: shotClockTime });
@@ -236,12 +220,12 @@ const postPeriod = (req, res) => {
         }
         homeFouls = 0;
         awayFouls = 0;
-        remainingTime = 600000; // resetear a lo que se indique por default 60000 = 10 minutos
+        remainingTime = TEN_MINUTES; // resetear a lo que se indique por default 60000 = 10 minutos
         if (matchTimer) {
             clearInterval(matchTimer);
             matchTimer = null;
         }
-        shotClockTime = 24000;
+        shotClockTime = LONG_SHOTCLOCK;
         if (shotClockTimer) {
             clearInterval(shotClockTimer);
             shotClockTimer = null;
@@ -251,7 +235,7 @@ const postPeriod = (req, res) => {
 }
 
 const getPosession = (req, res) => {
-    res.json({ homePosession: homePosession, awayPosession: awayPosession });
+    res.json({ homePosession: homePosession, awayPosession: awayPosession, posession: posession });
 }
 
 const postPosession = (req, res) => {
@@ -269,13 +253,12 @@ const postPosession = (req, res) => {
             posession = "away";
         }
     }
-    res.json({ homePosession: homePosession, awayPosession: awayPosession });
+    res.json({ homePosession: homePosession, awayPosession: awayPosession, posession: posession });
 }
 
-module.exports = {
+export {
     getScore,
     postScore,
-    reset,
     startTimer,
     stopTimer,
     getTime,
@@ -291,5 +274,13 @@ module.exports = {
     getPeriod,
     postPeriod,
     getPosession,
-    postPosession
+    postPosession,
+    reset
+    // resetScore,
+    // resetPeriod,
+    // resetTimeOut,
+    // resetFoul,
+    // resetShotClockDefault,
+    // resetTimer,
+    // resetPosession
 }
