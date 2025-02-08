@@ -1,7 +1,26 @@
-.team-container{
+/* @font-face {
+    font-family: 'CustomDots';
+    src: url('./path-to-your-custom-font.woff') format('woff');
+} */
+
+.scoreboard .team-container{
     display: inline-block;
-    width: 30%;
     text-align: center;
+    width: 50%;
+}
+
+.teamscoreboard .team-container {
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+}
+
+.teamscoreboard .team-container {
+    width: 100%;
+}
+
+.team-container .team{
+    width: 100%;
 }
 
 .team-container .name {
@@ -28,12 +47,14 @@
     font-size: 1rem;
     margin: 1px 1px 15px 1px;
     font-weight: bold;
+    /* font-family: 'CustomDots'; */
 }
 
 .team-container .time-outs {
     color: orange;
     font-size: 1rem;
     font-weight: bold;
+    /* font-family: 'CustomDots'; */
 }
 
 .team-container .controls {
@@ -43,3 +64,44 @@
     display: inline-block;
 }
 
+.team-container .statistics-panel {
+    display: table-cell;
+    width: 100%;
+    text-align: center;
+}
+
+.statistics-panel .player{
+    display: inline-flex;
+    width: 100%;
+}
+
+.statistics-panel .playername{
+    color: green;
+    width: 40%;
+    text-align: left;
+}
+
+.statistics-panel .playerpoints{
+    color: white;
+    width: 20%;
+    font-weight: bold;
+    text-align: left;
+}
+
+.statistics-panel .playerrebounds{
+    color: green;
+    width: 10%;
+    text-align: left;
+}
+
+.statistics-panel .playerassists{
+    color: blue;
+    width: 10%;
+    text-align: left;
+}
+
+.statistics-panel .playerfouls{
+    color: red;
+    width: 10%;
+    /* font-family: 'CustomDots'; */
+}

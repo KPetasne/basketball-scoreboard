@@ -29,6 +29,7 @@ function App() {
     const [homePosession, setHomePosession] = useState(null);
     const [awayPosession, setAwayPosession] = useState(null);
     const [board, setBoard] = useState(1);
+    const [boardTeam, setBoardTeam] = useState(1);
 
     useEffect(() => {
         const fetchAllData = async () => {
@@ -98,15 +99,33 @@ function App() {
         setShotClock(response.data.shotClockTime);
     };
 
+    const handleBoardChange = (event) => {
+        setBoard(parseInt(event.target.value));
+    };
+
+    const handleBoardTeamChange = (event) => {
+        setBoardTeam(event.target.value);
+    };
+
     return (
 
         <div className="App">
-            {/* <button onClick={boardType(1)}>Board 1</button>
-            <button onClick={boardType(2)}>Board 2</button> */}
+            {/* Dropdown to select board type */}
+            <div className="board-selector">
+                <label htmlFor="board-type">Select Board Format:</label>
+                <select id="board-type" value={board} onChange={handleBoardChange}>
+                    <option value="1">Format 1 - Scoreboard</option>
+                    <option value="2">Format 2 - Statistics</option>
+                    <option value="3">Format 3 - Team</option>
+                </select>
+            </div>
             <div className="board">
                 <div className='title'>MADEKA SPORTS</div>
                 <div className="scoreboard">
-                    <Team name='home' score={homeScore} fetchScore={fetchScore} controller={false} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts}></Team>  
+                    {board === 2 && (<div className="teamscoreboard">
+                        <Team name='home' teamscoreboard={true}></Team>  
+                    </div>)}
+                    <Team name='home' score={homeScore} fetchScore={fetchScore} controller={false} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} teamscoreboard={false}></Team>  
                     <div className="match">
                         <GameTimer controller={false} time={time} fetchTime={fetchTime}></GameTimer>
                         <div className="perpo">
@@ -115,8 +134,23 @@ function App() {
                             <GamePosession controller="away" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
                         </div>
                     </div>
-                    <Team name='away' score={awayScore} fetchScore={fetchScore}  controller={false} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts}></Team>
+                    <Team name='away' score={awayScore} fetchScore={fetchScore}  controller={false} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} teamscoreboard={false}></Team>
+                    {board === 2 && (<div className="teamscoreboard">
+                        <Team name='away' teamscoreboard={true}></Team>
+                    </div>)}
                 </div>
+                {board === 3 && (
+                    <div className="teamuniquescoreboard">
+                        <div className="board-selector">
+                            <label htmlFor="board-type">Select Team Board:</label>
+                            <select id="board-type-team" value={boardTeam} onChange={handleBoardTeamChange}>
+                                <option value="home">Home</option>
+                                <option value="away">Away</option>
+                            </select>
+                        </div>
+                        <Team name={boardTeam} teamscoreboard={true}></Team>  
+                    </div>
+                )}
                 <div className='sign'>Powered by MDK SOLUTIONS</div>
             </div>
             <div className="board-shot-clock">
@@ -131,7 +165,7 @@ function App() {
                     <div className="controller">
                         <div className='title'>CONTROLLER</div>
                         <div className="scoreboard">
-                            <Team name='home' score={homeScore} fetchScore={fetchScore} controller={true} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} fetchFouls={fetchFouls} fetchTimeOut={fetchTimeOuts} fetchPosession={fetchPosession}></Team>          
+                            <Team name='home' score={homeScore} teamscoreboard={false} fetchScore={fetchScore} controller={true} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} fetchFouls={fetchFouls} fetchTimeOut={fetchTimeOuts} fetchPosession={fetchPosession}></Team>          
                             <div className="match">
                                 <GameTimer controller={true} time={time} fetchTime={fetchTime}></GameTimer>
                                 <div className="perpo">
@@ -141,7 +175,7 @@ function App() {
                                 </div>
                                 <ShotClock shotClockTime={shotClockTime} timer={time} controller={true} />
                             </div>
-                            <Team name='away' score={awayScore} fetchScore={fetchScore} controller={true} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} fetchFouls={fetchFouls} fetchTimeOut={fetchTimeOuts} fetchPosession={fetchPosession}></Team>
+                            <Team name='away' score={awayScore} teamscoreboard={false} fetchScore={fetchScore} controller={true} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} fetchFouls={fetchFouls} fetchTimeOut={fetchTimeOuts} fetchPosession={fetchPosession}></Team>
                         </div>
                         <div className='controls'><button onClick={resetScores}>Reset</button></div>
                         <div className='sign'>Powered by MDK SOLUTIONS</div>
