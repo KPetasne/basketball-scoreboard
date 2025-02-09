@@ -14,7 +14,8 @@
   justify-content: center;
   align-items: center;
   background-color: black;
-  display: flow-root;
+  display: inline-flex;
+  width: 100%;
 }
 
 .board-shot-clock{
@@ -26,6 +27,12 @@
 }
 
 .scoreboard {
+  display: inline;
+  justify-content: center;
+  width: 100%;
+}
+
+.gamescoreboard {
   display: flex;
   justify-content: center;
   width: 100%;
@@ -37,10 +44,6 @@
   justify-content: center;
   width: 100%;
   margin: 1px 1px 1px 1px;
-}
-
-.teamscoreboard .team-container {
-  width: 100%;
 }
 
 .teamuniquescoreboard {
@@ -127,6 +130,7 @@
   font-size: 3rem;
   color: white;
   font-weight: bold;
+  width: 100%;
 }  
 
 
@@ -137,4 +141,5 @@
   align-items: right;
   display: inline-block;
   margin: 2px;
+  width: 100%;
 }  

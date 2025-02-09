@@ -3,19 +3,19 @@
     src: url('./path-to-your-custom-font.woff') format('woff');
 } */
 
-.scoreboard .team-container{
+.gamescoreboard .team-container{
     display: inline-block;
     text-align: center;
     width: 50%;
 }
 
-.teamscoreboard .team-container {
-    display: inline-block;
-    text-align: center;
-    width: 100%;
+.teamscoreboard {
+    width: 25%;
 }
 
 .teamscoreboard .team-container {
+    display: inline-block;
+    text-align: center;
     width: 100%;
 }
 
@@ -68,40 +68,4 @@
     display: table-cell;
     width: 100%;
     text-align: center;
-}
-
-.statistics-panel .player{
-    display: inline-flex;
-    width: 100%;
-}
-
-.statistics-panel .playername{
-    color: green;
-    width: 40%;
-    text-align: left;
-}
-
-.statistics-panel .playerpoints{
-    color: white;
-    width: 20%;
-    font-weight: bold;
-    text-align: left;
-}
-
-.statistics-panel .playerrebounds{
-    color: green;
-    width: 10%;
-    text-align: left;
-}
-
-.statistics-panel .playerassists{
-    color: blue;
-    width: 10%;
-    text-align: left;
-}
-
-.statistics-panel .playerfouls{
-    color: red;
-    width: 10%;
-    /* font-family: 'CustomDots'; */
 }

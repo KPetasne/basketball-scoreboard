@@ -120,38 +120,45 @@ function App() {
                 </select>
             </div>
             <div className="board">
-                <div className='title'>MADEKA SPORTS</div>
-                <div className="scoreboard">
-                    {board === 2 && (<div className="teamscoreboard">
+                {board === 2 && (
+                    <div className="teamscoreboard">
                         <Team name='home' teamscoreboard={true}></Team>  
-                    </div>)}
-                    <Team name='home' score={homeScore} fetchScore={fetchScore} controller={false} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} teamscoreboard={false}></Team>  
-                    <div className="match">
-                        <GameTimer controller={false} time={time} fetchTime={fetchTime}></GameTimer>
-                        <div className="perpo">
-                            <GamePosession controller="home" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
-                            <GamePeriod controller={false} fetchPeriod={fetchPeriod} period={period}></GamePeriod>
-                            <GamePosession controller="away" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
-                        </div>
-                    </div>
-                    <Team name='away' score={awayScore} fetchScore={fetchScore}  controller={false} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} teamscoreboard={false}></Team>
-                    {board === 2 && (<div className="teamscoreboard">
-                        <Team name='away' teamscoreboard={true}></Team>
-                    </div>)}
-                </div>
-                {board === 3 && (
-                    <div className="teamuniquescoreboard">
-                        <div className="board-selector">
-                            <label htmlFor="board-type">Select Team Board:</label>
-                            <select id="board-type-team" value={boardTeam} onChange={handleBoardTeamChange}>
-                                <option value="home">Home</option>
-                                <option value="away">Away</option>
-                            </select>
-                        </div>
-                        <Team name={boardTeam} teamscoreboard={true}></Team>  
                     </div>
                 )}
-                <div className='sign'>Powered by MDK SOLUTIONS</div>
+                <div className="scoreboard">
+                    <div className='title'>MADEKA SPORTS</div>
+                    <div className='gamescoreboard'>
+                        
+                        <Team name='home' score={homeScore} fetchScore={fetchScore} controller={false} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} teamscoreboard={false}></Team>  
+                        <div className="match">
+                            <GameTimer controller={false} time={time} fetchTime={fetchTime}></GameTimer>
+                            <div className="perpo">
+                                <GamePosession controller="home" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
+                                <GamePeriod controller={false} fetchPeriod={fetchPeriod} period={period}></GamePeriod>
+                                <GamePosession controller="away" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
+                            </div>
+                        </div>
+                        <Team name='away' score={awayScore} fetchScore={fetchScore}  controller={false} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} teamscoreboard={false}></Team>
+                    </div>
+                    {board === 3 && (
+                        <div className="teamuniquescoreboard">
+                            <div className="board-selector">
+                                <label htmlFor="board-type">Select Team Board:</label>
+                                <select id="board-type-team" value={boardTeam} onChange={handleBoardTeamChange}>
+                                    <option value="home">Home</option>
+                                    <option value="away">Away</option>
+                                </select>
+                            </div>
+                            <Team name={boardTeam} teamscoreboard={true}></Team>  
+                        </div>
+                    )}
+                    <div className='sign'>Powered by MDK SOLUTIONS</div>
+                </div>
+                {board === 2 && (
+                    <div className="teamscoreboard">
+                        <Team name='away' teamscoreboard={true}></Team>
+                    </div>
+                )}
             </div>
             <div className="board-shot-clock">
                 <ShotClock name='shot-clock' shotClockTime={shotClockTime} timer={time} controller={false} />
@@ -164,7 +171,7 @@ function App() {
                     <Profile />
                     <div className="controller">
                         <div className='title'>CONTROLLER</div>
-                        <div className="scoreboard">
+                        <div className="gamescoreboard">
                             <Team name='home' score={homeScore} teamscoreboard={false} fetchScore={fetchScore} controller={true} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} fetchFouls={fetchFouls} fetchTimeOut={fetchTimeOuts} fetchPosession={fetchPosession}></Team>          
                             <div className="match">
                                 <GameTimer controller={true} time={time} fetchTime={fetchTime}></GameTimer>
