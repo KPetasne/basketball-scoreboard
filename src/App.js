@@ -172,7 +172,7 @@ function App() {
                     <div className="controller">
                         <div className='title'>CONTROLLER</div>
                         <div className="gamescoreboard">
-                            <Team name='home' score={homeScore} teamscoreboard={false} fetchScore={fetchScore} controller={true} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} fetchFouls={fetchFouls} fetchTimeOut={fetchTimeOuts} fetchPosession={fetchPosession}></Team>          
+                            <Team name='home' score={homeScore} teamscoreboard={false} fetchScore={fetchScore} controller={true} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} fetchFouls={fetchFouls} fetchTimeOuts={fetchTimeOuts} fetchPosession={fetchPosession}></Team>          
                             <div className="match">
                                 <GameTimer controller={true} time={time} fetchTime={fetchTime}></GameTimer>
                                 <div className="perpo">
@@ -182,7 +182,7 @@ function App() {
                                 </div>
                                 <ShotClock shotClockTime={shotClockTime} timer={time} controller={true} />
                             </div>
-                            <Team name='away' score={awayScore} teamscoreboard={false} fetchScore={fetchScore} controller={true} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} fetchFouls={fetchFouls} fetchTimeOut={fetchTimeOuts} fetchPosession={fetchPosession}></Team>
+                            <Team name='away' score={awayScore} teamscoreboard={false} fetchScore={fetchScore} controller={true} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} fetchFouls={fetchFouls} fetchTimeOuts={fetchTimeOuts} fetchPosession={fetchPosession}></Team>
                         </div>
                         <div className='controls'><button onClick={resetScores}>Reset</button></div>
                         <div className='sign'>Powered by MDK SOLUTIONS</div>

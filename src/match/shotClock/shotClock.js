@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './ShotClock.css'
+import { LONG_SHOTCLOCK, SHORT_SHOTCLOCK, ONE_MINUTE, ONE_SECOND, FIVE_SECOND, INTERVAL_MS } from '../gameConstants';
 
 const ShotClock = ({ shotClockTime, fetchShotClock, timer, controller }) => {  
-    const ONE_MINUTE = 60000;
-    const FIVE_SECOND = 5000;
-    const ONE_SECOND = 1000;
-    const INTERVAL_MS = 100;
     const [timerRunning, setTimerRunning] = useState(false);
 
     useEffect(() => {
@@ -28,13 +25,13 @@ const ShotClock = ({ shotClockTime, fetchShotClock, timer, controller }) => {
         setTimerRunning(false);
     };
 
-    const resetShotClock = async () => {
-        await axios.post('/reset-shot-clock');
+    const resetShotClock = async (shotclock) => {
+        await axios.post('/reset-shot-clock', {shotclock} );
     };
 
-    const resetShotClockShort = async () => {
-        await axios.post('/reset-shot-clock-short');
-    };
+    // const resetShotClockShort = async () => {
+    //     await axios.post('/reset-shot-clock-short');
+    // };
 
     const formatTime = (timer, time) => {
         const minutes = Math.floor(time / ONE_MINUTE);
@@ -66,8 +63,8 @@ const ShotClock = ({ shotClockTime, fetchShotClock, timer, controller }) => {
                 <div className="controls">
                     <button onClick={startShotClock}>Start</button>
                     <button onClick={stopShotClock}>Stop</button>
-                    <button onClick={resetShotClock}>Reset 24</button>
-                    <button onClick={resetShotClockShort}>Reset 14</button>
+                    <button onClick={() => resetShotClock(LONG_SHOTCLOCK)}>Reset {formatTime("shot-clock",LONG_SHOTCLOCK)}</button>
+                    <button onClick={() => resetShotClock(SHORT_SHOTCLOCK)}>Reset {formatTime("shot-clock",SHORT_SHOTCLOCK)}</button>
                 </div>
             )}
         </div>

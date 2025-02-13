@@ -1,12 +1,13 @@
-// import { getScore, postScore } from '../services/scoreService.js';
-// import { updateTime, startTimer, stopTimer, getTime } from '../services/timerService.js';
-// import { updateShotClock, getShotClock, startShotClock, stopShotClock, resetShotClock, resetShotClockShort } from '../services/shotClockService.js';
-// import { getFoul, postFoul } from '../services/foulService.js';
-// import { getTimeOut, postTimeOut } from '../services/timeOutService.js';
-// import { getPeriod, postPeriod } from '../services/periodService.js';
-// import { getPosession, postPosession } from '../services/posessionService.js';
-import {TEN_MINUTES,ONE_MINUTE,LONG_SHOTCLOCK,SHORT_SHOTCLOCK,FIVE_SECOND,ONE_SECOND,INTERVAL_MS } from '../services/constants.js';
+// const ScoreService = require('../services/scoreService.js');
+// const TimerService = require('../services/timerService.js');
+// const ShotClockService = require('../services/shotClockService.js');
+// const FoulService = require('../services/foulService.js');
+// const TimeOutService = require('../services/timeOutService.js');
+// const PeriodService = require('../services/periodService.js');
+// const PosessionService = require('../services/posessionService.js');
 
+
+const constants = require('../services/constants.js');
 let homeScore = 0;
 let awayScore = 0;
 let homeFouls = 0;
@@ -18,13 +19,81 @@ let awayPosession = false;
 let period = 1;
 let posession = null;
 let matchTimer = null;
-let remainingTime = TEN_MINUTES; // 600 = 10 minutes in seconds
-let shotClockTime = LONG_SHOTCLOCK;
+let remainingTime = constants.TEN_MINUTES; // 600 = 10 minutes in seconds
+let shotClockTime = constants.LONG_SHOTCLOCK;
 let shotClockTimer = null;
+
+// const getScore = (req, res) => {
+//     try {
+//         res.json(ScoreService.getScore());
+//     } catch (error) {
+//         console.log(error);
+//     }
+// }
+
+const reset = (req, res) => {
+    homeScore = 0;
+    awayScore = 0;
+    homeFouls = 0;
+    awayFouls = 0;
+    homeTimeOuts = 2;
+    awayTimeOuts = 2;
+    homePosession = false;
+    awayPosession = false;
+    period = 1;
+    posession = null;
+    remainingTime = constants.TEN_MINUTES; // resetear a lo que se indique por default 60000 = 10 minutos
+    if (matchTimer) {
+        clearInterval(matchTimer);
+        matchTimer = null;
+    }
+    shotClockTime = constants.LONG_SHOTCLOCK;
+    if (shotClockTimer) {
+        clearInterval(shotClockTimer);
+        shotClockTimer = null;
+    }
+    // ScoreService.resetScore();
+    // FoulService.resetFoul();
+    // TimeOutService.resetTimeOut(2);
+    // PosessionService.resetPosession();
+    // PeriodService.resetPeriod();
+    // TimerService.resetTimer();
+    // ShotClockService.resetShotClockDefault(constants.LONG_SHOTCLOCK);
+    res.json({ home: homeScore, away: awayScore, time: remainingTime, shotClockTime: shotClockTime, period: period, posession: posession, homeFouls: homeFouls, awayFouls: awayFouls, homeTimeOuts: homeTimeOuts, awayTimeOuts: awayTimeOuts });
+}
+
+// module.exports = {
+//     // ScoreService,
+//     // TimerService,
+//     // ShotClockService,
+//     // FoulService,
+//     // TimeOutService,
+//     // PeriodService,
+//     // PosessionService,
+//     getScore,
+//     postScore: ScoreService.postScore,
+//     startTimer: TimerService.startTimer,
+//     stopTimer: TimerService.stopTimer,
+//     getTime: TimerService.getTime,
+//     getShotClock: ShotClockService.getShotClock,
+//     startShotClock: ShotClockService.startShotClock,
+//     stopShotClock: ShotClockService.stopShotClock,
+//     resetShotClock: ShotClockService.resetShotClock,
+//     // resetShotClockShort,
+//     getFoul: FoulService.getFoul,
+//     postFoul: FoulService.postFoul,
+//     getTimeOut: TimeOutService.getTimeOut,
+//     postTimeOut: TimeOutService.postTimeOut,
+//     getPeriod: PeriodService.getPeriod,
+//     postPeriod: PeriodService.postPeriod,
+//     getPosession: PosessionService.getPosession,
+//     postPosession: PosessionService.postPosession,
+//     reset
+// }
 
 const updateTime = () => {
     if (remainingTime > 0) {
-        remainingTime -= INTERVAL_MS;
+        remainingTime -= constants.INTERVAL_MS;
     } else {
         clearInterval(matchTimer);
         matchTimer = null;
@@ -35,7 +104,7 @@ const updateTime = () => {
 
 const updateShotClock = () => {
     if (shotClockTime > 0) {
-        shotClockTime -= INTERVAL_MS;
+        shotClockTime -= constants.INTERVAL_MS;
     } else {
         if (!matchTimer) {
             clearInterval(shotClockTimer);
@@ -70,37 +139,15 @@ const postScore = (req, res) => {
     res.json({ home: homeScore, away: awayScore });
 }
 
-const reset = (req, res) => {
-    homeScore = 0;
-    awayScore = 0;
-    homeFouls = 0;
-    awayFouls = 0;
-    homeTimeOuts = 2;
-    awayTimeOuts = 2;
-    homePosession = false;
-    awayPosession = false;
-    period = 1;
-    posession = null;
-    remainingTime = TEN_MINUTES; // resetear a lo que se indique por default 60000 = 10 minutos
-    if (matchTimer) {
-        clearInterval(matchTimer);
-        matchTimer = null;
-    }
-    shotClockTime = LONG_SHOTCLOCK;
-    if (shotClockTimer) {
-        clearInterval(shotClockTimer);
-        shotClockTimer = null;
-    }
-    res.json({ home: homeScore, away: awayScore, time: remainingTime, shotClockTime: shotClockTime, period: period, posession: posession, homeFouls: homeFouls, awayFouls: awayFouls, homeTimeOuts: homeTimeOuts, awayTimeOuts: awayTimeOuts });
-}
+
 
 const startTimer = (req, res) => {
     if (!matchTimer) {
-        matchTimer = setInterval(updateTime, INTERVAL_MS);
+        matchTimer = setInterval(updateTime, constants.INTERVAL_MS);
     }
-    if (!shotClockTimer) {
-        shotClockTimer = setInterval(updateShotClock, INTERVAL_MS);
-    }
+    // if (!shotClockTimer) {
+    //     shotClockTimer = setInterval(updateShotClock, constants.INTERVAL_MS);
+    // }
     res.json({ time: remainingTime, shotClockTime: shotClockTime });
 }
 
@@ -121,7 +168,7 @@ const getShotClock = (req, res) => {
 }
 const startShotClock = (req, res) => {
     if (!shotClockTimer) {
-        shotClockTimer = setInterval(updateShotClock, INTERVAL_MS);
+        shotClockTimer = setInterval(updateShotClock, constants.INTERVAL_MS);
     }
     res.json({ shotClockTime: shotClockTime });
 }
@@ -133,32 +180,35 @@ const stopShotClock = (req, res) => {
     }
     res.json({ shotClockTime: shotClockTime });
 }
+
 const resetShotClock = (req, res) => {
-    if (remainingTime <= LONG_SHOTCLOCK) {
+    const {shotclock} = req.body;
+    console.log(req.body);
+    if (remainingTime <= shotclock) {
         clearInterval(shotClockTimer);
         shotClockTimer = null;
         shotClockTime = "-1";
     } else {
-        shotClockTime = LONG_SHOTCLOCK;
+        shotClockTime = shotclock;
         if (!shotClockTimer && matchTimer) {
-            shotClockTimer = setInterval(updateShotClock, INTERVAL_MS);
+            shotClockTimer = setInterval(updateShotClock, constants.INTERVAL_MS);
         }
     }
     res.json({ shotClockTime: shotClockTime });
 }
-const resetShotClockShort = (req, res) => {
-    if (remainingTime <= SHORT_SHOTCLOCK) {
-        clearInterval(shotClockTimer);
-        shotClockTimer = null;
-        shotClockTime = "-1";
-    } else {
-        shotClockTime = SHORT_SHOTCLOCK;
-        if (!shotClockTimer && matchTimer) {
-            shotClockTimer = setInterval(updateShotClock, INTERVAL_MS);
-        }
-    }
-    res.json({ shotClockTime: shotClockTime });
-}
+// const resetShotClockShort = (req, res) => {
+//     if (remainingTime <= constants.SHORT_SHOTCLOCK) {
+//         clearInterval(shotClockTimer);
+//         shotClockTimer = null;
+//         shotClockTime = "-1";
+//     } else {
+//         shotClockTime = constants.SHORT_SHOTCLOCK;
+//         if (!shotClockTimer && matchTimer) {
+//             shotClockTimer = setInterval(updateShotClock, constants.INTERVAL_MS);
+//         }
+//     }
+//     res.json({ shotClockTime: shotClockTime });
+// }
 
 const getFoul = (req, res) => {
     res.json({ homeFouls: homeFouls, awayFouls: awayFouls });
@@ -220,12 +270,12 @@ const postPeriod = (req, res) => {
         }
         homeFouls = 0;
         awayFouls = 0;
-        remainingTime = TEN_MINUTES; // resetear a lo que se indique por default 60000 = 10 minutos
+        remainingTime = constants.TEN_MINUTES; // resetear a lo que se indique por default 60000 = 10 minutos
         if (matchTimer) {
             clearInterval(matchTimer);
             matchTimer = null;
         }
-        shotClockTime = LONG_SHOTCLOCK;
+        shotClockTime = constants.LONG_SHOTCLOCK;
         if (shotClockTimer) {
             clearInterval(shotClockTimer);
             shotClockTimer = null;
@@ -256,7 +306,7 @@ const postPosession = (req, res) => {
     res.json({ homePosession: homePosession, awayPosession: awayPosession, posession: posession });
 }
 
-export {
+module.exports = {
     getScore,
     postScore,
     startTimer,
@@ -266,7 +316,7 @@ export {
     startShotClock,
     stopShotClock,
     resetShotClock,
-    resetShotClockShort,
+    // resetShotClockShort,
     getFoul,
     postFoul,
     getTimeOut,

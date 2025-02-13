@@ -1,11 +1,10 @@
 let homeTimeOuts = 2;
 let awayTimeOuts = 2;
 
-// const resetTimeOut = () => {
-//     homeTimeOuts = 2;
-//     awayTimeOuts = 2;
-//     res.json({ homeTimeOuts: homeTimeOuts, awayTimeOuts: awayTimeOuts});
-// };
+const resetTimeOut = (timeout) => {
+    homeTimeOuts,awayTimeOuts = timeout;
+    // res.json({ homeTimeOuts: homeTimeOuts, awayTimeOuts: awayTimeOuts});
+};
 
 const getTimeOut = (req, res) => {
     res.json({ homeTimeOuts: homeTimeOuts, awayTimeOuts: awayTimeOuts});
@@ -21,10 +20,10 @@ const postTimeOut = (req, res) => {
     res.json({ homeTimeOuts: homeTimeOuts, awayTimeOuts: awayTimeOuts});
 };
 
-export  {
+module.exports = {
     getTimeOut,
     postTimeOut,
-    // resetTimeOut,
+    resetTimeOut,
     homeTimeOuts,
-    awayTimeOuts
+    awayTimeOuts,
 };

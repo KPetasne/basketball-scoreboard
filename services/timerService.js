@@ -1,40 +1,42 @@
-import { INTERVAL_MS, TEN_MINUTES } from './constants.js';
-import { shotClockTimer, updateShotClock, shotClockTime } from './shotClockService.js';
+const constants = require('./constants.js');
+const constShotClockService = require('./shotClockService.js');
 
 let matchTimer = null;
-let remainingTime = TEN_MINUTES; // 10 minutos
+let remainingTime = constants.TEN_MINUTES; // 10 minutos
 
-// const resetTimer = () => {
-//     matchTimer = null;
-//     remainingTime = TEN_MINUTES; // 10 minutos
-//     res.json({ time: remainingTime });
-// };
+const clearTimer = () => {
+    clearInterval(matchTimer);
+    matchTimer = null;
+}
+
+const resetTimer = () => {
+    matchTimer = null;
+    remainingTime = constants.TEN_MINUTES; // 10 minutos
+    clearTimer();
+};
 
 const updateTime = () => {
     if (remainingTime > 0) {
         remainingTime -= INTERVAL_MS;
     } else {
-        clearInterval(matchTimer);
-        matchTimer = null;
-        clearInterval(shotClockTimer);
-        shotClockTimer = null;
+        clearTimer();
+        constShotClockService.shotClockClear();
     }
 };
 
 const startTimer = (req, res) => {
     if (!matchTimer) {
-        matchTimer = setInterval(updateTime, INTERVAL_MS);
+        matchTimer = setInterval(updateTime, constants.INTERVAL_MS);
     }
-    if (!shotClockTimer) {
-        shotClockTimer = setInterval(updateShotClock, INTERVAL_MS);
-    }
-    res.json({ time: remainingTime, shotClockTime: shotClockTime });
+    // if (!shotClockTimer) {
+    //     shotClockTimer = setInterval(constShotClockService.updateShotClock, INTERVAL_MS);
+    // }
+    res.json({ time: remainingTime });
 };
 
 const stopTimer = (req, res) => {
     if (matchTimer) {
-        clearInterval(matchTimer);
-        matchTimer = null;
+        clearTimer();
     }
     res.json({ time: remainingTime });
 };
@@ -43,12 +45,12 @@ const getTime = (req, res) => {
     res.json({ time: remainingTime });
 };
 
-export  {
-    // resetTimer,
+module.exports = {
+    resetTimer,
     updateTime,
     startTimer,
     stopTimer,
     getTime,
     matchTimer,
-    remainingTime
+    remainingTime,
 };

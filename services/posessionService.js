@@ -2,12 +2,12 @@ let homePosession = false;
 let awayPosession = false;
 let posession = null;
 
-// const resetPosession = () => {
-//     let homePosession = false;
-//     let awayPosession = false;
-//     let posession = null;
-//     res.json({ homePosession: homePosession, awayPosession: awayPosession, posession: posession });
-// };
+const resetPosession = () => {
+    homePosession = false;
+    awayPosession = false;
+    posession = null;
+    // res.json({ homePosession: homePosession, awayPosession: awayPosession, posession: posession });
+};
 
 const getPosession = (req, res) => {
     res.json({ homePosession: homePosession, awayPosession: awayPosession, posession: posession });
@@ -26,9 +26,9 @@ const postPosession = (req, res) => {
     res.json({ homePosession: homePosession, awayPosession: awayPosession, posession: posession });
 };
 
-export {
+module.exports = {
     getPosession,
     postPosession,
-    // resetPosession,
-    posession
+    resetPosession,
+    posession,
 };

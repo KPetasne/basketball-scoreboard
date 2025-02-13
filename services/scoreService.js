@@ -1,15 +1,18 @@
 let homeScore = 0;
 let awayScore = 0;
 
-// const resetScore = () => {
-//     homeScore = 0;
-//     awayScore = 0;
-//     res.json({ home: homeScore, away: awayScore });
-// };
+const resetScore = () => {
+    homeScore = 0;
+    awayScore = 0;
+};
 
 const getScore = (req, res) => {
     res.json({ home: homeScore, away: awayScore });
 };
+
+// const getScore = (req, res) => {
+//     return { home: homeScore, away: awayScore };
+// };
 
 const postScore = (req, res) => {
     const { team, points } = req.body;
@@ -29,8 +32,8 @@ const postScore = (req, res) => {
     res.json({ home: homeScore, away: awayScore });
 };
 
-export  {
-    // resetScore,
+module.exports = {
+    resetScore,
     getScore,
     postScore,
     homeScore,
