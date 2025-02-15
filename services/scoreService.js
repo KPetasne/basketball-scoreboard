@@ -10,10 +10,6 @@ const getScore = (req, res) => {
     res.json({ home: homeScore, away: awayScore });
 };
 
-// const getScore = (req, res) => {
-//     return { home: homeScore, away: awayScore };
-// };
-
 const postScore = (req, res) => {
     const { team, points } = req.body;
     if (team === 'home') {

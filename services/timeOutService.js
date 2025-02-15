@@ -3,7 +3,6 @@ let awayTimeOuts = 2;
 
 const resetTimeOut = (timeout) => {
     homeTimeOuts,awayTimeOuts = timeout;
-    // res.json({ homeTimeOuts: homeTimeOuts, awayTimeOuts: awayTimeOuts});
 };
 
 const getTimeOut = (req, res) => {

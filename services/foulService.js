@@ -4,7 +4,6 @@ let awayFouls = 0;
 const resetFoul = () => {
     homeFouls = 0;
     awayFouls = 0;
-    // res.json({ homeFouls, awayFouls });
 };
 
 const getFoul = (req, res) => {

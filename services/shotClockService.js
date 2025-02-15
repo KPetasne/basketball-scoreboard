@@ -1,5 +1,4 @@
 const constants = require('./constants.js');
-const constTimerService = require('./timerService.js');
 
 let shotClockTime = constants.LONG_SHOTCLOCK;
 let shotClockTimer = null;
@@ -15,10 +14,11 @@ const resetShotClockDefault = () => {
 };
 
 const updateShotClock = () => {
+    const { isMatchTimerActive } = require('./timerService.js');
     if (shotClockTime > 0) {
         shotClockTime -= constants.INTERVAL_MS;
     } else {
-        if (!constTimerService.matchTimer) {
+        if (!isMatchTimerActive()) {
             shotClockClear();
         }
     }
@@ -43,32 +43,20 @@ const stopShotClock = (req, res) => {
 };
 
 const resetShotClock = (req, res) => {
-    const { shotClock } = req.body;
-    if (constTimerService.remainingTime <= shotClock) {
+    const shotclock = req.body.shotclock;
+    const { remainingTimeActive } = require('./timerService.js');
+    const { isMatchTimerActive } = require('./timerService.js');
+    if (remainingTimeActive <= shotclock) {
         shotClockClear();
         shotClockTime = "-1";
     } else {
-        shotClockTime = shotClock;
-        if (!shotClockTimer && constTimerService.matchTimer) {
+        shotClockTime = shotclock;
+        if (!shotClockTimer && !isMatchTimerActive()) {
             shotClockTimer = setInterval(updateShotClock, constants.INTERVAL_MS);
         }
     }
     res.json({ shotClockTime: shotClockTime });
 };
-
-// const resetShotClockShort = (req, res) => {
-//     if (constTimerService.remainingTime <= constants.SHORT_SHOTCLOCK) {
-//         clearInterval(shotClockTimer);
-//         shotClockTimer = null;
-//         shotClockTime = "-1";
-//     } else {
-//         shotClockTime = constants.SHORT_SHOTCLOCK;
-//         if (!shotClockTimer && constTimerService.matchTimer) {
-//             shotClockTimer = setInterval(updateShotClock, constants.INTERVAL_MS);
-//         }
-//     }
-//     res.json({ shotClockTime: shotClockTime });
-// };
 
 module.exports = {
     resetShotClockDefault,
@@ -76,7 +64,6 @@ module.exports = {
     startShotClock,
     stopShotClock,
     resetShotClock,
-    // resetShotClockShort,
     shotClockTimer,
     shotClockTime,
     updateShotClock,

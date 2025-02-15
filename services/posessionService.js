@@ -6,7 +6,6 @@ const resetPosession = () => {
     homePosession = false;
     awayPosession = false;
     posession = null;
-    // res.json({ homePosession: homePosession, awayPosession: awayPosession, posession: posession });
 };
 
 const getPosession = (req, res) => {
