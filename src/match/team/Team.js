@@ -3,16 +3,11 @@ import axios from 'axios';
 import './Team.css';
 import Player from './player/player.js';
 
-function Team({ name, score, fetchScore, controller, homeTeam, fouls, timeOuts, fetchFouls, fetchTimeOuts, fetchPosession, teamscoreboard }) {
+function Team({ name, score, addPoints, controller, homeTeam, fouls, timeOuts, fetchFouls, fetchTimeOuts, fetchPosession, teamscoreboard }) {
 
     const teamName = () => {
         return name.toUpperCase();
     }
-    
-    const addPoints = async (team, points) => {
-        await axios.post('/score', { team, points });
-        fetchScore();
-    };
 
     const postPosession = async (team, posession) => {
         await axios.post('/posession', { team, posession });

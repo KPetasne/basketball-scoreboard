@@ -1,0 +1,43 @@
+.court-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.court {
+    width: 800px;
+    height: 428px;
+    background-color: #f8c471;
+    border: 2px solid white;
+    cursor: pointer;
+}
+
+.shot-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #f9f9f9;
+    color: black;
+    margin: 10px;
+}
+
+.shot-form label {
+    margin-bottom: 10px;
+}
+
+.shots-list {
+    margin-top: 20px;
+    width: 500px;
+}
+
+.shots-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.shots-list li {
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
+}

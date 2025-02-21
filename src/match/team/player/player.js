@@ -6,21 +6,21 @@ function Players({ teamname }) {
 
     // Ejemplo de uso
     const players = [
-        { number: 12, name: 'MDK', points: 15, rebounds: 5, assists: 7, fouls: 2 },
-        { number: 23, name: 'MADEKA', points: 10, rebounds: 6, assists: 3, fouls: 4 },
-        { number: 6, name: 'MK', points: 8, rebounds: 4, assists: 2, fouls: 3 },
+        { number: 1, name: 'MDK', points: 15, rebounds: 5, assists: 7, fouls: 2 },
+        { number: 2, name: 'MADEKA', points: 10, rebounds: 6, assists: 3, fouls: 4 },
+        { number: 3, name: 'MK', points: 8, rebounds: 4, assists: 2, fouls: 3 },
+        { number: 4, name: 'MARTIN', points: 15, rebounds: 1, assists: 1, fouls: 2 },
+        { number: 5, name: 'KRASNY', points: 15, rebounds: 1, assists: 1, fouls: 2 },
+        { number: 6, name: 'MDK', points: 15, rebounds: 5, assists: 7, fouls: 2 },
+        { number: 7, name: 'MADEKA', points: 10, rebounds: 6, assists: 3, fouls: 4 },
+        { number: 8, name: 'MK', points: 8, rebounds: 4, assists: 2, fouls: 3 },
         { number: 9, name: 'MARTIN', points: 15, rebounds: 1, assists: 1, fouls: 2 },
-        { number: 21, name: 'KRASNY', points: 15, rebounds: 1, assists: 1, fouls: 2 },
-        { number: 12, name: 'MDK', points: 15, rebounds: 5, assists: 7, fouls: 2 },
-        { number: 23, name: 'MADEKA', points: 10, rebounds: 6, assists: 3, fouls: 4 },
-        { number: 6, name: 'MK', points: 8, rebounds: 4, assists: 2, fouls: 3 },
-        { number: 9, name: 'MARTIN', points: 15, rebounds: 1, assists: 1, fouls: 2 },
-        { number: 21, name: 'KRASNY', points: 15, rebounds: 1, assists: 1, fouls: 2 },
-        { number: 12, name: 'MDK', points: 15, rebounds: 5, assists: 7, fouls: 2 },
-        { number: 23, name: 'MADEKA', points: 10, rebounds: 6, assists: 3, fouls: 4 },
-        { number: 6, name: 'MK', points: 8, rebounds: 4, assists: 2, fouls: 3 },
-        { number: 9, name: 'MARTIN', points: 15, rebounds: 1, assists: 1, fouls: 2 },
-        { number: 21, name: 'KRASNY', points: 15, rebounds: 1, assists: 1, fouls: 2 },
+        { number: 10, name: 'KRASNY', points: 15, rebounds: 1, assists: 1, fouls: 2 },
+        { number: 11, name: 'MDK', points: 15, rebounds: 5, assists: 7, fouls: 2 },
+        { number: 22, name: 'MADEKA', points: 10, rebounds: 6, assists: 3, fouls: 4 },
+        { number: 13, name: 'MK', points: 8, rebounds: 4, assists: 2, fouls: 3 },
+        { number: 14, name: 'MARTIN', points: 15, rebounds: 1, assists: 1, fouls: 2 },
+        { number: 15, name: 'KRASNY', points: 15, rebounds: 1, assists: 1, fouls: 2 },
         // Agrega más jugadores según sea necesario
     ];
     

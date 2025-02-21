@@ -8,6 +8,7 @@ import GamePeriod from './match/gamePeriod.js';
 import GamePosession from './match/gamePosession.js';
 import { TEN_MINUTES, ONE_MINUTE,LONG_SHOTCLOCK,SHORT_SHOTCLOCK, FIVE_SECOND,ONE_SECOND,INTERVAL_MS } from './match/gameConstants.js';
 import {LoginButton,LogoutButton,Profile} from './log/log.js';
+import BasketballCourt from './match/basketballCourt.js';
 
 import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
 const domain = process.env.REACT_APP_AUTH0_DOMAIN || "dev-u3c555b5wr3ui240.us.auth0.com"; 
@@ -30,6 +31,7 @@ function App() {
     const [awayPosession, setAwayPosession] = useState(null);
     const [board, setBoard] = useState(1);
     const [boardTeam, setBoardTeam] = useState(1);
+    const [courtView, setCourtView] = useState(false);
 
     useEffect(() => {
         const fetchAllData = async () => {
@@ -51,6 +53,11 @@ function App() {
         const response = await axios.get('/score');
         setHomeScore(response.data.home);
         setAwayScore(response.data.away);
+    };
+
+    const addPoints = async (team, points) => {
+        await axios.post('/score', { team, points });
+        fetchScore();
     };
 
     const fetchFouls = async () => {
@@ -107,6 +114,10 @@ function App() {
         setBoardTeam(event.target.value);
     };
 
+    const handleCourtView = (event) => {
+        setCourtView(event.target.checked);
+    };
+
     return (
 
         <div className="App">
@@ -118,6 +129,7 @@ function App() {
                     <option value="2">Format 2 - Statistics</option>
                     <option value="3">Format 3 - Team</option>
                 </select>
+                 Court View <input type="checkbox" name="courtview" onChange={handleCourtView}/>
             </div>
             <div className="board">
                 {board === 2 && (
@@ -129,7 +141,7 @@ function App() {
                     <div className='title'>MADEKA SPORTS</div>
                     <div className='gamescoreboard'>
                         
-                        <Team name='home' score={homeScore} fetchScore={fetchScore} controller={false} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} teamscoreboard={false}></Team>  
+                        <Team name='home' score={homeScore} addPoints={addPoints} controller={false} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} teamscoreboard={false}></Team>  
                         <div className="match">
                             <GameTimer controller={false} time={time} fetchTime={fetchTime}></GameTimer>
                             <div className="perpo">
@@ -138,7 +150,7 @@ function App() {
                                 <GamePosession controller="away" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
                             </div>
                         </div>
-                        <Team name='away' score={awayScore} fetchScore={fetchScore}  controller={false} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} teamscoreboard={false}></Team>
+                        <Team name='away' score={awayScore} addPoints={addPoints}  controller={false} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} teamscoreboard={false}></Team>
                     </div>
                     {board === 3 && (
                         <div className="teamuniquescoreboard">
@@ -163,6 +175,9 @@ function App() {
             <div className="board-shot-clock">
                 <ShotClock name='shot-clock' shotClockTime={shotClockTime} timer={time} controller={false} />
             </div>
+            {courtView === true && (
+                <BasketballCourt time={time} shotClockTime={shotClockTime} period={period} homeScore={homeScore} awayScore={awayScore} addPoints={addPoints} controller={false} />
+            )}
             {!isAuthenticated ? ( 
                 <LoginButton /> 
             ) : ( 
@@ -172,7 +187,7 @@ function App() {
                     <div className="controller">
                         <div className='title'>CONTROLLER</div>
                         <div className="gamescoreboard">
-                            <Team name='home' score={homeScore} teamscoreboard={false} fetchScore={fetchScore} controller={true} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} fetchFouls={fetchFouls} fetchTimeOuts={fetchTimeOuts} fetchPosession={fetchPosession}></Team>          
+                            <Team name='home' score={homeScore} teamscoreboard={false} addPoints={addPoints} controller={true} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} fetchFouls={fetchFouls} fetchTimeOuts={fetchTimeOuts} fetchPosession={fetchPosession}></Team>          
                             <div className="match">
                                 <GameTimer controller={true} time={time} fetchTime={fetchTime}></GameTimer>
                                 <div className="perpo">
@@ -182,8 +197,10 @@ function App() {
                                 </div>
                                 <ShotClock shotClockTime={shotClockTime} timer={time} controller={true} />
                             </div>
-                            <Team name='away' score={awayScore} teamscoreboard={false} fetchScore={fetchScore} controller={true} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} fetchFouls={fetchFouls} fetchTimeOuts={fetchTimeOuts} fetchPosession={fetchPosession}></Team>
+                            <Team name='away' score={awayScore} teamscoreboard={false} addPoints={addPoints} controller={true} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} fetchFouls={fetchFouls} fetchTimeOuts={fetchTimeOuts} fetchPosession={fetchPosession}></Team>
                         </div>
+                        <div className='title'>Registro de Tiros</div>
+                        <BasketballCourt time={time} shotClockTime={shotClockTime} period={period} homeScore={homeScore} awayScore={awayScore} addPoints={addPoints} controller={true} />
                         <div className='controls'><button onClick={resetScores}>Reset</button></div>
                         <div className='sign'>Powered by MDK SOLUTIONS</div>
                     </div>
