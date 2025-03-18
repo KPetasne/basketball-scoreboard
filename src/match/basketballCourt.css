@@ -27,17 +27,17 @@
     margin-bottom: 10px;
 }
 
-.shots-list {
+.plays-list {
     margin-top: 20px;
     width: 500px;
 }
 
-.shots-list ul {
+.plays-list ul {
     list-style-type: none;
     padding: 0;
 }
 
-.shots-list li {
+.plays-list li {
     padding: 5px 0;
     border-bottom: 1px solid #ddd;
 }

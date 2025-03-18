@@ -1,13 +1,39 @@
+const { remainingTimeActive } = require("./timerService");
+
 let homeScore = 0;
 let awayScore = 0;
+let homeLeadTime = 0; // Tiempo en el que homeScore estuvo arriba
+let awayLeadTime = 0; // Tiempo en el que awayScore estuvo arriba
+let leadChanges = 0; // Cantidad de cambios de líder
+let lastLeader = ''; // Último líder marcador
+let ties = 0; // Cantidad de veces empatados
+let startTime = Date.now(); // Tiempo de inicio
 
 const resetScore = () => {
     homeScore = 0;
     awayScore = 0;
+    homeLeadTime = 0;
+    awayLeadTime = 0;
+    leadChanges = 0;
+    lastLeader = '';
+    ties = 0;
+    startTime = Date.now();
 };
 
+const currentScore = () => {
+    return { 
+        home: homeScore, 
+        away: awayScore,
+        homeLeadTime,
+        awayLeadTime,
+        leadChanges,
+        lastLeader,
+        ties };
+}
+
 const getScore = (req, res) => {
-    res.json({ home: homeScore, away: awayScore });
+    const score = currentScore();
+    res.json(score);
 };
 
 const postScore = (req, res) => {
@@ -25,6 +51,25 @@ const postScore = (req, res) => {
             awayScore += points;
         }
     }
+    // Actualizar tiempos de liderazgo
+    if (homeScore > awayScore) {
+        homeLeadTime += (remainingTimeActive() - startTime);
+        if (lastLeader !== 'home') {
+            leadChanges++;
+            lastLeader = 'home';
+        }
+    } else if (awayScore > homeScore) {
+        awayLeadTime += (remainingTimeActive() - startTime);
+        if (lastLeader !== 'away') {
+            leadChanges++;
+            lastLeader = 'away';
+        }
+    } else {
+        ties++;
+        lastLeader = lastLeader || 'empate';
+    }
+    startTime = remainingTimeActive();
+
     res.json({ home: homeScore, away: awayScore });
 };
 
@@ -32,6 +77,7 @@ module.exports = {
     resetScore,
     getScore,
     postScore,
+    currentScore,
     homeScore,
     awayScore
 };

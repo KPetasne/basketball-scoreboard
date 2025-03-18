@@ -1,12 +1,12 @@
 import React, {useState, useEffect} from 'react';
+import axios from 'axios';
 import './BasketballCourt.css';
-import { ONE_MINUTE, ONE_SECOND } from './gameConstants';
+import { ONE_MINUTE, ONE_SECOND, INTERVAL_MS } from './gameConstants';
 
 const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awayScore, addPoints}) => {
 
     const [viewBox, setViewBox] = React.useState("0 0 2800 1500"); 
     const [plays, setPlays] = useState([]);
-    const [shots, setShots] = useState([]);
     const [team, setTeam] = useState('home'); // Estado para el equipo seleccionado
     const [selectedLocals, setSelectedLocals] = useState([]);  
     const [selectedAways, setSelectedAways] = useState([]);  
@@ -23,32 +23,172 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
         }
     };
 
-    const [shotInfo, setShotInfo] = useState({
-        x: null,
-        y: null,
-        points:'',
-        teamplayer:'',
-        player: '',
-        made: false,
-        assist: '',
-        distanceFromHoop: null,
+    const [playInfo, setPlayInfo] = useState({
+        actionType: '', // 'shot' || 'violation' || 'timeout' || 'substitution' || 'freethrow' || 'endtime' || 'turnover'
+        teamOffence: '',
+        changeOffence: null,
         time: formatTime(time),
         period: period,
         shotClockTime: formatTime(shotClockTime),
         homeScore: homeScore,
         awayScore: awayScore
     });
+    // || 'rebound' || 'assist' || 'block' || 'steal' || 'charge' || 'technical' || 'flagrant' || 'doublefoul' || 'triplefoul' || 'unsportsmanlike' || 'disqualifying' || 'personal' || 'team' || 'offensive' || 'defensive' || 'looseball' || 'deadball' || 'jumpball' || 'technical' || 'flagrant' || 'doublefoul' || 'triplefoul' || 'unsportsmanlike' || 'disqualifying' || 'personal' || 'team'
+    // || 'shot' || 'foul' || 'timeout' || 'substitution' || 'jumpball' || 'freethrow' || 'violation' || 'turnover' || 'rebound' || 'assist' || 'block' || 'steal' || 'charge' || 'technical' || 'flagrant' || 'doublefoul' || 'triplefoul' || 'unsportsmanlike' || 'disqualifying' || 'personal' || 'team' || 'offensive' || 'defensive' || 'looseball' || 'deadball' || 'jumpball' || 'technical' || 'flagrant' || 'doublefoul' || 'triplefoul' || 'unsportsmanlike' || 'disqualifying' || 'personal' || 'team' || 'offensive' || 'defensive' || 'looseball' || 'deadball' || 'jumpball' || 'technical' || 'flagrant' || 'doublefoul' || 'triplefoul' || 'unsportsmanlike' || 'disqualifying' || 'personal' || 'team' || 'offensive' || 'defensive' || 'looseball' || 'deadball' || 'jumpball' || 'technical' || 'flagrant' || 'doublefoul' || 'triplefoul' || 'unsportsmanlike' || 'disqualifying' || 'personal' || 'team' || 'offensive' || 'defensive' || 'looseball' || 'deadball' || 'jumpball' || 'technical' || 'flagrant' || 'doublefoul' || 'triplefoul' || 'unsportsmanlike' || 'disqualifying' || 'personal' || 'team' || 'offensive' || 'defensive' || 'looseball' || 'deadball' || 'jumpball' || 'technical' || 'flagrant' || 'doublefoul' || 'triplefoul' || 'unsportsmanlike' || 'disqualifying' || 'personal' || 'team' || 'offensive' || 'defensive' || 'looseball' || 'deadball' || 'jumpball' || 'technical' || 'flagrant' || 'doublefoul' || 'triplefoul' || 'unsportsmanlike' || 'disqualifying' || 'personal' || 'team' 
+    
+    const [violationInfo, setViolationInfo] = useState({
+        violationType: '', // 'jumpball' || 'shotClockEnd' || 'halfCourtViolation' || 'backCourtViolation' || 'outOfBounds' || 'foul' || 'laneViolation' || 'doubleDribble' || 'travel' || 'threeSeconds' || 'fiveSeconds' || 'tenSeconds' || 'shotClockViolation' || 'illegalScreen' || 'offensiveGoaltending' || 'defensiveGoaltending' || 'kickedBall' || 'delayOfGame' || 'illegalDefense' || 'technical' || 'flagrant' || 'doublefoul' || 'triplefoul' || 'unsportsmanlike' || 'disqualifying' || 'personal' || 'team'
+        player: '',
+    });    
+    
+    const [foulInfo, setFoulInfo] = useState({
+        foulPosition: '', // 'offensive' || 'defensive'
+        foulClassification: '', // 'personal' || 'technical' || 'flagrant' || 'doublefoul' || 'triplefoul' || 'unsportsmanlike' || 'disqualifying'
+        foulType: '', // 'charge' ... 
+        player: '',
+        playerFouled: '',
+    });
 
-    useEffect(() => {  
-        setShotInfo(prevShotInfo => ({  
-            ...prevShotInfo,  
-            time: formatTime(time),
-            period: period,
-            shotClockTime: formatTime(shotClockTime),
-            homeScore: homeScore,  
-            awayScore: awayScore  
-        }));  
-    }, [time, period, shotClockTime, homeScore, awayScore]); // Dependiendo de estas props  
+    const [substitutionInfo, setSubstitutionInfo] = useState({
+        playerReplaced: '',
+        playerIn: '',
+    });
+
+    const [turnOverInfo, setTurnOverInfo] = useState({
+        turnOverType: '', // 'personal' || 'team'
+        player: '',
+    });
+
+    const [stealInfo, setStealInfo] = useState({
+        stealType: '', // 'interception' || 'deflection' || 'strip'
+        player: '',
+    });
+
+    const [assistInfo, setAssistInfo] = useState({
+        assistType: '', // 'bouncepass' 
+        player: '',
+    });
+
+    const [reboundInfo, setReboundInfo] = useState({
+        reboundType: '', // 'offensive' || 'defensive' 
+        player: '',
+    });
+
+    const [blockInfo, setBlockInfo] = useState({
+        blockType: '', 
+        player: '',
+    });
+
+    const [shotInfo, setShotInfo] = useState({
+        shotType: '', // 'jumpshot' || 'dunk' || 'layup' || 'hookshot' || 'fadeaway' || 'alleyoop' || 'bankshot' || 'turnaround' || 'tipin' || 'putback' || 'stepback' || 'pullup' || 'floating' || 'fingerroll' || 'slamdunk' || 'jumpstep' || 'jumpfloat' || 'jumpfade' || 'jumpbank' || 'jumpturn' || 'jumpstep' || 'jumpfloat' || 'jumpfinger' || 'jumpslam' || 'jumpdunk' || 'jumpalley' || 'jumpbounce' || 'jumpputback' || 'jumpstepback' || 'jumpfloating' || 'jumpfingerroll' || 'jumpslamdunk' || 'jumpjumpstep' || 'jumpjumpfloat' || 'jumpjumpfade' || 'jumpjumpbank' || 'jumpjumpturn' || 'jumpjumpstep' || 'jumpjumpfloat' || 'jumpjumpfinger' || 'jumpjumpslam' || 'jumpjumpdunk' || 'jumpjumpalley' || 'jumpjumpbounce' || 'jumpjumpputback' || 'jumpjumpstepback' || 'jumpjumpfloating' || 'jumpjumpfingerroll' || 'jumpjumpslamdunk' || 'jumpjumpjumpstep' || 'jumpjumpjumpfloat' || 'jumpjumpjumpfade' || 'jumpjumpjumpbank' || 'jumpjumpjumpturn' || 'jumpjumpjumpstep' || 'jumpjumpjumpfloat' || 'jumpjumpjumpfinger' || 'jumpjumpjumpslam' || 'jumpjumpjumpdunk' || 'jumpjumpjumpalley' || 'jumpjumpjumpbounce' || 'jumpjumpjumpputback' || 'jumpjumpjumpstepback' || 'jumpjumpjumpfloating' || 'jumpjumpjumpfingerroll' || 'jumpjumpjumpslamdunk' || 'jumpjumpjumpjumpstep' || 'jumpjumpjumpjumpfloat' || 'jumpjumpjumpjumpfade' || 'jumpjumpjumpjumpbank' || 'jumpjumpjumpjumpturn' || 'jumpjumpjumpjumpstep' || 'jumpjumpjumpjumpfloat' || 'jumpjumpjumpjumpfinger' || 'jumpjumpjumpjumpslam' || 'jumpjumpjumpjumpdunk' || 'jumpjumpjumpjumpalley' || 'jumpjumpjumpjumpbounce' || 'jumpjumpjump
+        x: null,
+        y: null,
+        distanceFromHoop: null,
+        points:'',
+        teamplayer:'',
+        player: '',
+        fouled: false,
+        made: false, //  'rebound' || 'assist' || 'foul' || 'block'
+        blocked: false,
+        assisted: false,
+        continueOffence: false,
+        // time: formatTime(time),
+        // period: period,
+        // shotClockTime: formatTime(shotClockTime),
+        // homeScore: homeScore,
+        // awayScore: awayScore
+    });
+
+    // useEffect(() => {  
+    //     setShotInfo(prevShotInfo => ({  
+    //         ...prevShotInfo,  
+    //         time: formatTime(time),
+    //         period: period,
+    //         shotClockTime: formatTime(shotClockTime),
+    //         homeScore: homeScore,  
+    //         awayScore: awayScore  
+    //     }));  
+    // }, [time, period, shotClockTime, homeScore, awayScore]); // Dependiendo de estas props  
+    const resetAllStates = () => {
+        setPlayInfo({
+            actionType: '', 
+            teamOffence: '',
+            changeOffence: null,
+        });
+
+        setViolationInfo({
+            violationType: '', 
+            player: '',
+        });
+
+        setFoulInfo({
+            foulPosition: '', 
+            foulClassification: '', 
+            foulType: '', 
+            player: '',
+            playerFouled: '',
+        });
+
+        setSubstitutionInfo({
+            playerReplaced: '',
+            playerIn: '',
+        });
+
+        setTurnOverInfo({
+            turnOverType: '', 
+            player: '',
+        });
+
+        setStealInfo({
+            stealType: '', 
+            player: '',
+        });
+
+        setAssistInfo({
+            assistType: '', 
+            player: '',
+        });
+
+        setReboundInfo({
+            reboundType: '', 
+            player: '',
+        });
+
+        setBlockInfo({
+            blockType: '', 
+            player: '',
+        });
+
+        setShotInfo({
+            shotType: '', 
+            x: null,
+            y: null,
+            distanceFromHoop: null,
+            points: '',
+            teamplayer: '',
+            player: '',
+            fouled: false,
+            made: false, 
+            blocked: false,
+            assisted: false,
+            continueOffence: false,
+        });
+    };
+    
+    useEffect(() => {
+        // Cargar las jugadas desde el servidor al montar el componente
+        fetchPlays();
+        const interval = setInterval(() => {
+            fetchPlays();
+        },ONE_SECOND); // cada una decima de segundo actualiza la informacion
+        return () => clearInterval(interval);
+    }, []);
+
+    const fetchPlays = async () => {
+        const response = await axios.get('/plays');
+        console.log(response.data.plays);
+        setPlays(response.data.plays);
+    };
 
     const calculatePoints = (x, y) => {  
         const HoopX = (team === 'home' && shotInfo.teamplayer === 'home' && 2642.5 || 
@@ -82,6 +222,58 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
             ...shotInfo,
             [name]: type === 'checkbox' ? checked : value
         });
+        // const { name, value, type, checked } = event.target;
+        // if (name in playInfo) {
+        //     setPlayInfo({
+        //         ...playInfo,
+        //         [name]: type === 'checkbox' ? checked : value
+        //     });
+        // } else if (name in violationInfo) {
+        //     setViolationInfo({
+        //         ...violationInfo,
+        //         [name]: value
+        //     });
+        // } else if (name in foulInfo) {
+        //     setFoulInfo({
+        //         ...foulInfo,
+        //         [name]: value
+        //     });
+        // } else if (name in substitutionInfo) {
+        //     setSubstitutionInfo({
+        //         ...substitutionInfo,
+        //         [name]: value
+        //     });
+        // } else if (name in turnOverInfo) {
+        //     setTurnOverInfo({
+        //         ...turnOverInfo,
+        //         [name]: value
+        //     });
+        // } else if (name in stealInfo) {
+        //     setStealInfo({
+        //         ...stealInfo,
+        //         [name]: value
+        //     });
+        // } else if (name in assistInfo) {
+        //     setAssistInfo({
+        //         ...assistInfo,
+        //         [name]: value
+        //     });
+        // } else if (name in reboundInfo) {
+        //     setReboundInfo({
+        //         ...reboundInfo,
+        //         [name]: value
+        //     });
+        // } else if (name in blockInfo) {
+        //     setBlockInfo({
+        //         ...blockInfo,
+        //         [name]: value
+        //     });
+        // } else if (name in shotInfo) {
+        //     setShotInfo({
+        //         ...shotInfo,
+        //         [name]: type === 'checkbox' ? checked : value
+        //     });
+        // }
     };
 
     const handleTeamChange = (event) => {
@@ -116,50 +308,25 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
         });
     };  
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        setPlays([...plays, shotInfo ]); // Almacenar coordenadas  
         shotInfo.made ? addPoints(shotInfo.teamplayer, shotInfo.points) && 
-            shotInfo.teamplayer === 'home' ? shotInfo.homeScore += shotInfo.points : shotInfo.awayScore += shotInfo.points : '' ;
-        // Agrega la información del tiro al array de shots
-        setShots([...shots, shotInfo]);
+            shotInfo.teamplayer === 'home' ? playInfo.homeScore += shotInfo.points : playInfo.awayScore += shotInfo.points : '' ;
+        const newPlay = {
+            ...playInfo,
+            ...shotInfo,
+        };
+        // setPlays(...plays, newPlay); // Enviar la información al servidor
         // Aquí puedes enviar la información del tiro al servidor
-        // try {
-        //     const response = await fetch('/api/shots', {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json'
-        //         },
-        //         body: JSON.stringify(shotInfo)
-        //     });
-
-        //     if (response.ok) {
-        //         console.log('Tiro registrado exitosamente');
-        //         // Aquí puedes limpiar el formulario o mostrar una notificación
-        //         setShotInfo({
-        //             x: null,
-        //             y: null,
-        //             player: '',
-        //             made: false,
-        //             assist: ''
-        //         });
-        //     } else {
-        //         console.error('Error al registrar el tiro');
-        //     }
-        // } catch (error) {
-        //     console.error('Error:', error);
-        // }
+        try {
+            await axios.post('/plays', { play: newPlay });
+            fetchPlays();
+            console.log('Jugada registrada exitosamente' + newPlay);
+        } catch (error) {
+            console.error('Error al registrar la jugada:', error);
+        }
         // Reinicia el formulario
-        setShotInfo({
-            x: null,
-            y: null,
-            points: '',
-            teamplayer:'',
-            player: '',
-            made: false,
-            assist: '',
-            distanceFromHoop: null
-        });
+        resetAllStates();
         setTeamPlayer([]);  
         setSelectedLocals([]);  
         setSelectedAways([]);  
@@ -386,8 +553,8 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
                             Asistente: 
                             <input
                                 type="text"
-                                name="assist"
-                                value={shotInfo.assist}
+                                name="assistplayer"
+                                value={shotInfo.assistplayer}
                                 onChange={handleInputChange}
                             />
                         </label>
@@ -396,12 +563,13 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
                 </form>
             )}
 
-            <div className="shots-list">
+            <div className="plays-list">
                 <h3>Tiros Registrados</h3>
                 <ul>
-                    {shots.map((shot, index) => (
+                    
+                    {plays && plays.map((play, index) => (
                         <li key={index}>
-                            H {shot.homeScore} - {shot.awayScore} A, {shot.period}-{shot.time}-{shot.shotClockTime}, Equipo: {shot.teamplayer}, Jugador: {shot.player}, {shot.made ? 'Tiro Exitoso' : 'Tiro Fallido'}{shot.made ? ', Asistente:' + shot.assist : ''}, Puntos: {shot.points}, Posición: ({shot.x}, {shot.y})
+                            {play.matchPlays}/{play.periodPlay} H {play.homeScore} - {play.awayScore} A, {play.period}-{play.time}-{play.shotClockTime}, Equipo: {play.teamplayer}, Jugador: {play.player}, {play.made ? 'Tiro Exitoso' : 'Tiro Fallido'}{play.made && play.assisted ? ', Asistente:' + play.assistplayer : ''}, Puntos: {play.points}, Posición: ({play.x}, {play.y})
                         </li>
                     ))}
                 </ul>

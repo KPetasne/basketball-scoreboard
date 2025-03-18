@@ -83,6 +83,10 @@ router.get('/time-outs', board.getTimeOut);
 
 router.post('/time-outs', board.postTimeOut);
 
+router.get('/plays', board.getPlay);
+
+router.post('/plays', board.postPlay);
+
 router.post('/reset', board.reset);
 
 // router.post('/reset-score', board.resetScore);

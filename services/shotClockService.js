@@ -58,6 +58,10 @@ const resetShotClock = (req, res) => {
     res.json({ shotClockTime: shotClockTime });
 };
 
+const remainingShotClockTimeActive = () => {
+    return shotClockTime;
+};
+
 module.exports = {
     resetShotClockDefault,
     getShotClock,
@@ -68,4 +72,5 @@ module.exports = {
     shotClockTime,
     updateShotClock,
     shotClockClear,
+    remainingShotClockTimeActive
 };
