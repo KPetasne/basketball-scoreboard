@@ -55,7 +55,6 @@ const postPlay = (req, res) => {
 
     // Agregar jugada al array
     plays.push(newPlay);
-    console.log(plays);
     res.json({plays: plays});
 }
 
