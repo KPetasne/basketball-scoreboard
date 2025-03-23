@@ -7,11 +7,12 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
 
     const [viewBox, setViewBox] = React.useState("0 0 2800 1500"); 
     const [plays, setPlays] = useState([]);
-    const [team, setTeam] = useState('home'); // Estado para el equipo seleccionado
+    const [lastPlayInfo, setLastPlayInfo] = useState([]);
+    const [teamRight, setTeamRight] = useState('home'); // Estado para el equipo seleccionado
     const [selectedLocals, setSelectedLocals] = useState([]);  
     const [selectedAways, setSelectedAways] = useState([]);  
     const [teamPlayer, setTeamPlayer] = useState(''); // Estado para el ultimo jugador seleccionado
-    const [info, setInfo] = useState(false); // Estado para la informacion del jugador seleccionado
+    const [info, setInfo] = useState(null); // Estado para la informacion del jugador seleccionado
     const [players, setPlayers] = useState([
         { id: 1, name: 'Player 1', team: 'home', onCourt: true },
         { id: 2, name: 'Player 2', team: 'home', onCourt: true },
@@ -47,6 +48,7 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
         shotClockTime: formatTime(shotClockTime),
         homeScore: homeScore,
         awayScore: awayScore,
+        teamPosition: '',
         teamPlay: ''
     });
 
@@ -63,33 +65,33 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
     
     const [violationInfo, setViolationInfo] = useState({
         violationType: '', // 'jumpball' || 'shotClockEnd' || 'halfCourtViolation' || 'backCourtViolation' || 'outOfBounds' || 'foul' || 'laneViolation' || 'doubleDribble' || 'travel' || 'threeSeconds' || 'fiveSeconds' || 'tenSeconds' || 'shotClockViolation' || 'illegalScreen' || 'offensiveGoaltending' || 'defensiveGoaltending' || 'kickedBall' || 'delayOfGame' || 'illegalDefense' || 'technical' || 'flagrant' || 'doublefoul' || 'triplefoul' || 'unsportsmanlike' || 'disqualifying' || 'personal' || 'team'
-        player: '',
+        violationPlayer: '',
     });    
 
     const violationTypes = [
-        { value: "jumpball", label: "Jump Ball", category: "team", validatePossession: true, classification: "both", autoChangePossession: false },
-        { value: "shotClockEnd", label: "Shot Clock End", category: "team", validatePossession: false, classification: "offensive", autoChangePossession: true },
-        { value: "halfCourtViolation", label: "Half Court Violation", category: "team", validatePossession: false, classification: "offensive", autoChangePossession: true },
-        { value: "backCourtViolation", label: "Back Court Violation", category: "team", validatePossession: false, classification: "offensive", autoChangePossession: true },
-        { value: "outOfBounds", label: "Out of Bounds", category: "team", validatePossession: false, classification: "both", autoChangePossession: false },
-        { value: "foul", label: "Foul", category: "personal", validatePossession: false, classification: "defensive", autoChangePossession: false },
-        { value: "laneViolation", label: "Lane Violation", category: "team", validatePossession: false, classification: "defensive", autoChangePossession: false },
-        { value: "doubleDribble", label: "Double Dribble", category: "personal", validatePossession: false, classification: "offensive", autoChangePossession: true },
-        { value: "travel", label: "Travel", category: "personal", validatePossession: false, classification: "offensive", autoChangePossession: true },
-        { value: "threeSeconds", label: "Three Seconds", category: "team", validatePossession: false, classification: "offensive", autoChangePossession: true },
-        { value: "fiveSeconds", label: "Five Seconds", category: "team", validatePossession: false, classification: "both", autoChangePossession: true },
-        { value: "shotClockViolation", label: "Shot Clock Violation", category: "team", validatePossession: false, classification: "offensive", autoChangePossession: true },
-        { value: "offensiveGoaltending", label: "Offensive Goaltending", category: "team", validatePossession: false, classification: "offensive", autoChangePossession: true },
-        { value: "defensiveGoaltending", label: "Defensive Goaltending", category: "team", validatePossession: false, classification: "defensive", autoChangePossession: true },
-        { value: "kickedBall", label: "Kicked Ball", category: "team", validatePossession: false, classification: "both", autoChangePossession: true },
-        { value: "delayOfGame", label: "Delay of Game", category: "team", validatePossession: false, classification: "both", autoChangePossession: false },
-        { value: "illegalDefense", label: "Illegal Defense", category: "team", validatePossession: false, classification: "defensive", autoChangePossession: false },
+        { value: "jumpball", label: "Jump Ball", category: "team", validatePossession: true, classification: "both", selection: 'none', autoChangePossession: false },
+        { value: "halfCourtViolation", label: "Half Court Violation", category: "team", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: true },
+        { value: "backCourtViolation", label: "Back Court Violation", category: "team", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: true },
+        { value: "offensiveOutOfBounds", label: "Out of Bounds", category: "personal", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: false },
+        { value: "defensiveOutOfBounds", label: "Out of Bounds", category: "team", validatePossession: false, classification: "defensive", selection: 'one', autoChangePossession: false },
+        { value: "foul", label: "Foul", category: "personal", validatePossession: true, classification: "both", selection: 'both', autoChangePossession: true },
+        { value: "laneViolation", label: "Lane Violation", category: "team", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: false },
+        { value: "doubleDribble", label: "Double Dribble", category: "personal", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: true },
+        { value: "travel", label: "Travel", category: "personal", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: true },
+        { value: "threeSeconds", label: "Three Seconds", category: "team", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: true },
+        { value: "fiveSeconds", label: "Five Seconds", category: "team", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: true },
+        { value: "shotClockViolation", label: "Shot Clock Violation", category: "team", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: true },
+        { value: "offensiveGoaltending", label: "Offensive Goaltending", category: "team", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: true },
+        { value: "defensiveGoaltending", label: "Defensive Goaltending", category: "team", validatePossession: false, classification: "defensive", selection: 'one', autoChangePossession: true },
+        { value: "kickedBall", label: "Kicked Ball", category: "personal", validatePossession: true, classification: "none", selection: 'both', autoChangePossession: true },
+        { value: "delayOfGame", label: "Delay of Game", category: "team", validatePossession: false, classification: "none", selection: 'both', autoChangePossession: true },
+        { value: "illegalDefense", label: "Illegal Defense", category: "team", validatePossession: false, classification: "defensive", selection: 'one', autoChangePossession: false },
     ];
     
     const [foulInfo, setFoulInfo] = useState({
         foulClassification: '', // 'offensive' || 'defensive'
         foulType: '', // e.g., 'charge'
-        player: '', // Jugador que comete la falta
+        foulPlayer: '', // Jugador que comete la falta
         playerFouled: '', // Jugador que recibe la falta (si aplica)
         onShot: null, // true, false o null
         and1: null, // true, false o null
@@ -132,27 +134,26 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
 
     const [turnOverInfo, setTurnOverInfo] = useState({
         turnOverType: '', // 'personal' || 'team'
-        player: '',
+        turnOverPlayer: '',
     });
 
     const turnOverTypes = [
-        { value: "personal", label: "Personal Turnover", type: "steal", stopsGame: false, category: "personal" }, 
+        { value: "handle", label: "Handle Turnover", type: "steal", stopsGame: false, category: "personal" }, 
         { value: "team", label: "Team Turnover", type: "violation", stopsGame: true, category: "team" }, 
         { value: "badPass", label: "Bad Pass", type: "steal", stopsGame: false, category: "personal" }, 
         { value: "travel", label: "Travel", type: "violation", stopsGame: true, category: "personal" }, 
         { value: "doubleDribble", label: "Double Dribble", type: "violation", stopsGame: true, category: "personal" }, 
-        { value: "threeSeconds", label: "Three Seconds", type: "violation", stopsGame: true, category: "team" }, 
+        { value: "threeSeconds", label: "Three Seconds", type: "violation", stopsGame: true, category: "personal" }, 
         { value: "fiveSeconds", label: "Five Seconds", type: "violation", stopsGame: true, category: "team" }, 
-        { value: "tenSeconds", label: "Ten Seconds", type: "violation", stopsGame: true, category: "team" }, 
         { value: "shotClockViolation", label: "Shot Clock Violation", type: "violation", stopsGame: true, category: "team" }, 
-        { value: "steal", label: "Steal", type: "steal", stopsGame: false, category: "personal" }, 
         { value: "offensiveFoul", label: "Offensive Foul", type: "violation", stopsGame: true, category: "personal" }, 
         { value: "illegalScreen", label: "Illegal Screen", type: "violation", stopsGame: true, category: "personal" }, 
         { value: "laneViolation", label: "Lane Violation", type: "violation", stopsGame: true, category: "team" }, 
-        { value: "outOfBounds", label: "Out of Bounds", type: "violation", stopsGame: true, category: "team" }, 
-        { value: "backCourt", label: "Back Court", type: "violation", stopsGame: true, category: "team" }, 
+        { value: "offensiveOutOfBounds", label: "Out of Bounds", type: "violation", stopsGame: true, category: "personal" }, 
+        { value: "halfCourtViolation", label: "Half Court", type: "violation", stopsGame: true, category: "team" }, 
+        { value: "backCourtViolation", label: "Back Court", type: "violation", stopsGame: true, category: "team" }, 
         { value: "offensiveGoaltending", label: "Offensive Goaltending", type: "violation", stopsGame: true, category: "team" }, 
-        { value: "stepOutOfBounds", label: "Step Out of Bounds", type: "violation", stopsGame: true, category: "personal" }, 
+        { value: "offensiveOutOfBounds", label: "Step Out of Bounds", type: "violation", stopsGame: true, category: "personal" }, 
         { value: "heldBall", label: "Held Ball", type: "violation", stopsGame: true, category: "team" }, 
         { value: "kickedBall", label: "Kicked Ball", type: "violation", stopsGame: true, category: "team" }, 
         { value: "delayOfGame", label: "Delay of Game", type: "violation", stopsGame: true, category: "team" }, 
@@ -163,7 +164,7 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
 
     const [stealInfo, setStealInfo] = useState({
         stealType: '', // 'interception' || 'deflection' || 'strip'
-        player: '',
+        stealPlayer: '',
     });
 
     const stealTypes = [
@@ -190,7 +191,7 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
 
     const [assistInfo, setAssistInfo] = useState({
         assistType: '', // 'bouncepass' || 'chestpass' || 'overheadpass' || 'lobpass' || 'noLookPass' || 'behindTheBack' || 'wrapAround' || 'alleyoop' || 'handoff' || 'dribbleHandoff' || 'inbound' || 'outlet' || 'skip' || 'touch' || 'postEntry' || 'pickAndRoll' || 'cut' || 'backdoor' || 'screen' || 'pick' || 'roll' || 'pop' || 'fade' || 'slip' || 'flare' || 'pin' || 'seal' || 'dive' || 'spotUp' || 'relocate' || 'rebound' || 'foul' || 'block'
-        player: '',
+        assistPlayer: '',
     });
 
     const assistTypes = [
@@ -232,7 +233,7 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
 
     const [reboundInfo, setReboundInfo] = useState({
         reboundType: '', // 'offensive' || 'defensive' 
-        player: '',
+        reboundPlayer: '',
     });
 
     const reboundTypes = [
@@ -242,7 +243,7 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
 
     const [blockInfo, setBlockInfo] = useState({
         blockType: '', 
-        player: '',
+        blockPlayer: '',
     });
 
     const blockTypes = [
@@ -269,16 +270,16 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
 
     const [shotInfo, setShotInfo] = useState({
         shotType: '', // 'jumpshot' || 'dunk' || 'layup' || 'hookshot' || 'fadeaway' || 'alleyoop' || 'bankshot' || 'turnaround' || 'tipin' || 'putback' || 'stepback' || 'pullup' || 'floating' || 'fingerroll' || 'slamdunk' || 'jumpstep' || 'jumpfloat' || 'jumpfade' || 'jumpbank' || 'jumpturn' || 'jumpstep' || 'jumpfloat' || 'jumpfinger' || 'jumpslam' || 'jumpdunk' || 'jumpalley' || 'jumpbounce' || 'jumpputback' || 'jumpstepback' || 'jumpfloating' || 'jumpfingerroll' || 'jumpslamdunk' || 'jumpjumpstep' || 'jumpjumpfloat' || 'jumpjumpfade' || 'jumpjumpbank' || 'jumpjumpturn' || 'jumpjumpstep' || 'jumpjumpfloat' || 'jumpjumpfinger' || 'jumpjumpslam' || 'jumpjumpdunk' || 'jumpjumpalley' || 'jumpjumpbounce' || 'jumpjumpputback' || 'jumpjumpstepback' || 'jumpjumpfloating' || 'jumpjumpfingerroll' || 'jumpjumpslamdunk' || 'jumpjumpjumpstep' || 'jumpjumpjumpfloat' || 'jumpjumpjumpfade' || 'jumpjumpjumpbank' || 'jumpjumpjumpturn' || 'jumpjumpjumpstep' || 'jumpjumpjumpfloat' || 'jumpjumpjumpfinger' || 'jumpjumpjumpslam' || 'jumpjumpjumpdunk' || 'jumpjumpjumpalley' || 'jumpjumpjumpbounce' || 'jumpjumpjumpputback' || 'jumpjumpjumpstepback' || 'jumpjumpjumpfloating' || 'jumpjumpjumpfingerroll' || 'jumpjumpjumpslamdunk' || 'jumpjumpjumpjumpstep' || 'jumpjumpjumpjumpfloat' || 'jumpjumpjumpjumpfade' || 'jumpjumpjumpjumpbank' || 'jumpjumpjumpjumpturn' || 'jumpjumpjumpjumpstep' || 'jumpjumpjumpjumpfloat' || 'jumpjumpjumpjumpfinger' || 'jumpjumpjumpjumpslam' || 'jumpjumpjumpjumpdunk' || 'jumpjumpjumpjumpalley' || 'jumpjumpjumpjumpbounce' || 'jumpjumpjump
-        x: null,
-        y: null,
+        posx: null,
+        posy: null,
         distanceFromHoop: null,
         points:'',
-        player: '',
-        fouled: false,
-        made: false, //  'rebound' || 'assist' || 'foul' || 'block'
-        blocked: false,
-        assisted: false,
-        continueOffence: false,
+        shotPlayer: '',
+        fouled: null,
+        made: null, //  'rebound' || 'assist' || 'foul' || 'block'
+        blocked: null,
+        assisted: null,
+        continueOffence: null,
         // time: formatTime(time),
         // period: period,
         // shotClockTime: formatTime(shotClockTime),
@@ -333,37 +334,28 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
     const filteredPlayers = players.filter(player => 
         player.team === playInfo.teamOffence && player.onCourt
     );
-    // useEffect(() => {  
-    //     setShotInfo(prevShotInfo => ({  
-    //         ...prevShotInfo,  
-    //         time: formatTime(time),
-    //         period: period,
-    //         shotClockTime: formatTime(shotClockTime),
-    //         homeScore: homeScore,  
-    //         awayScore: awayScore  
-    //     }));  
-    // }, [time, period, shotClockTime, homeScore, awayScore]); // Dependiendo de estas props  
 
-    const resetAllStates = () => {
+    const resetAllStates = async () => {
         setInfo(false);
         setTeamPlayer('');
-
+        
         setPlayInfo({
             actionType: '', 
-            teamOffence: '',
+            // teamOffence: '',
             changeOffence: null,
+            teamPosition: '',
             teamPlay: ''
         });
 
         setViolationInfo({
             violationType: '', 
-            player: '',
+            violationPlayer: '',
         });
 
         setFoulInfo({
             foulClassification: '', 
             foulType: '', 
-            player: '',
+            foulPlayer: '',
             playerFouled: '',
             onShot: null,
             and1: null,
@@ -378,41 +370,41 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
 
         setTurnOverInfo({
             turnOverType: '', 
-            player: '',
+            turnOverPlayer: '',
         });
 
         setStealInfo({
             stealType: '', 
-            player: '',
+            stealPlayer: '',
         });
 
         setAssistInfo({
             assistType: '', 
-            player: '',
+            assistPlayer: '',
         });
 
         setReboundInfo({
             reboundType: '',
-            player: '',
+            reboundPlayer: '',
         });
 
         setBlockInfo({
             blockType: '', 
-            player: '',
+            blockPlayer: '',
         });
 
         setShotInfo({
             shotType: '', 
-            x: null,
-            y: null,
+            posx: null,
+            posy: null,
             distanceFromHoop: null,
             points: '',
-            player: '',
-            fouled: false,
-            made: false, 
-            blocked: false,
-            assisted: false,
-            continueOffence: false,
+            shotPlayer: '',
+            fouled: null,
+            made: null, //  'rebound' || 'assist' || 'foul' || 'block'
+            blocked: null,
+            assisted: null,
+            continueOffence: null,
         });
     };
     
@@ -421,6 +413,7 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
         fetchPlays();
         const interval = setInterval(() => {
             fetchPlays();
+            // console.log(plays);
         },ONE_SECOND); // cada una decima de segundo actualiza la informacion
         return () => clearInterval(interval);
     }, []);
@@ -428,13 +421,42 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
     const fetchPlays = async () => {
         const response = await axios.get('/plays');
         setPlays(response.data.plays);
+        // fetchLastPlay(response.data.plays);
     };
 
+    const fetchLastPlay = (plays) => {
+        if (plays.length > 0) {
+            const lastPlay = plays[plays.length - 1]; // Retrieve the last play
+    
+            // Update lastPlayInfo safely using a setter (if lastPlayInfo is state)
+            setLastPlayInfo((prev) => ({
+                ...prev,
+                teamOffence: lastPlay.teamOffence,
+                changeOffence: lastPlay.changeOffence,
+                actionType: lastPlay.actionType,
+            }));
+    
+            // Determine teamOffence for playInfo
+            setPlayInfo((prev) => ({
+                ...prev,
+                teamOffence:
+                    lastPlay.changeOffence
+                        ? lastPlay.teamOffence === 'home'
+                            ? 'away'
+                            : 'home'
+                        : lastPlay.actionType === 'endtime'
+                        ? lastPlay.teamOffence // Use arrow logic for clarity
+                        : lastPlay.teamOffence,
+            }));
+        }
+    };
+    
+
     const calculatePoints = (x, y) => {  
-        const HoopX = (team === 'home' && playInfo.teamOffence === 'home' && 2642.5 || 
-                team === 'home' && playInfo.teamOffence === 'away' && 157.5 || 
-                team === 'away' && playInfo.teamOffence === 'away' && 2642.5 || 
-                team === 'away' && playInfo.teamOffence === 'home' && 157.5
+        const HoopX = (teamRight === 'home' && playInfo.teamOffence === 'home' && 2642.5 || 
+            teamRight === 'home' && playInfo.teamOffence === 'away' && 157.5 || 
+            teamRight === 'away' && playInfo.teamOffence === 'away' && 2642.5 || 
+            teamRight === 'away' && playInfo.teamOffence === 'home' && 157.5
         ); // Coordenadas X del aro en función del equipo  
         const threePointLineRadius = 6.75; // Radio de la línea de tres puntos en mm (convertido a unidades de SVG)  
         
@@ -442,21 +464,21 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
         const distanceFromHoop = (Math.sqrt((x - HoopX) ** 2 + (y - 750) ** 2)/100).toFixed(2);
         
         // Condiciones para 2 puntos (verificar si el tiro es dentro de las zonas de 2 puntos)  
-        const isInTwoPointZone = (team === 'home' && playInfo.teamOffence === 'away' && x <= 299 && y >= 90 && y <= 1410) ||  
-                                (team === 'away' && playInfo.teamOffence === 'home' && x <= 299 && y >= 90 && y <= 1410) || 
-                                (team === 'away' && playInfo.teamOffence === 'away' && x >= 2501 && y >= 90 && y <= 1410) ||   
-                                (team === 'home' && playInfo.teamOffence === 'home' && x >= 2501 && y >= 90 && y <= 1410) ||   
-                                (team === 'away' && playInfo.teamOffence === 'away' && x < 2501 && distanceFromHoop < threePointLineRadius) ||
-                                (team === 'home' && playInfo.teamOffence === 'home' && x > 299 && distanceFromHoop < threePointLineRadius) ||
-                                (team === 'home' && playInfo.teamOffence === 'away' && x > 299 && distanceFromHoop < threePointLineRadius) ||
-                                (team === 'away' && playInfo.teamOffence === 'home' && x < 2501 && distanceFromHoop < threePointLineRadius)
+        const isInTwoPointZone = (teamRight === 'home' && playInfo.teamOffence === 'away' && x <= 299 && y >= 90 && y <= 1410) ||  
+                                (teamRight === 'away' && playInfo.teamOffence === 'home' && x <= 299 && y >= 90 && y <= 1410) || 
+                                (teamRight === 'away' && playInfo.teamOffence === 'away' && x >= 2501 && y >= 90 && y <= 1410) ||   
+                                (teamRight === 'home' && playInfo.teamOffence === 'home' && x >= 2501 && y >= 90 && y <= 1410) ||   
+                                (teamRight === 'away' && playInfo.teamOffence === 'away' && x < 2501 && distanceFromHoop < threePointLineRadius) ||
+                                (teamRight === 'home' && playInfo.teamOffence === 'home' && x > 299 && distanceFromHoop < threePointLineRadius) ||
+                                (teamRight === 'home' && playInfo.teamOffence === 'away' && x > 299 && distanceFromHoop < threePointLineRadius) ||
+                                (teamRight === 'away' && playInfo.teamOffence === 'home' && x < 2501 && distanceFromHoop < threePointLineRadius)
         ;
         const points = isInTwoPointZone ? 2 : 3; // Calcular los puntos del tiro
         // Agregar la nueva posición de clic al estado 
         setShotInfo({ ...shotInfo, x, y, points, distanceFromHoop, });
     };   
 
-    const handleInputChange = async (event) => {
+    const handleInputChange = (event) => {
         const { name, value, type, checked } = event.target;
         setShotInfo({
             ...shotInfo,
@@ -464,7 +486,21 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
         });
     };
 
-    const handleInputFoulChange = async (event) => {
+    const handleViolationTeamChange = (event) => {
+        const teamPosition = event.target.value;
+    
+        // Update playInfo state safely
+        setPlayInfo((prev) => ({
+            ...prev,
+            teamPosition,
+            changeOffence: prev.actionType === 'timeout' ? false : prev.changeOffence,
+            teamOffence: prev.actionType === 'timeout' ? false : prev.teamOffence,
+            teamPlay: prev.actionType === 'timeout' ? false : teamPosition,
+        }));
+    };
+    
+
+    const handleInputFoulChange = (event) => {
         const { name, value, type, checked } = event.target;
         setShotInfo({
             ...shotInfo,
@@ -476,52 +512,109 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
         });
     };
 
-    const handleTeamPlayerChange = async (event) => {
-        setPlayInfo({
-            ...playInfo,
-            teamOffence: event.target.value
-        });
-    };
-
-    const handleViolationChange = async (event) => {
-        setViolationInfo({ ...violationInfo, violationType: event.target.value });
-        if (playInfo.team === playInfo.teamOffence){
-            setTurnOverInfo({ ...turnOverInfo, turnOverType: violationInfo.violationType });
-            setPlayInfo({ ...playInfo, changeOffence: true});
-        } else {
-            setPlayInfo({ ...playInfo, changeOffence: false});
-        }
-    };
-
-    const handleTurnOverChange = async (event) => {
-        setTurnOverInfo({ ...turnOverInfo, turnOverType: event.target.value });
-        if (turnOverInfo.category === 'team') {
-            setPlayInfo({...playInfo, changeOffence: true});
-        }
-    }    
+    const handleTeamPlayerChange = (event) => {
+        const teamOffence = event.target.value;
     
-    const handleSubstitutionChange = async (event) => {
+        // Update playInfo state safely using setPlayInfo
+        setPlayInfo((prev) => ({
+            ...prev,
+            teamOffence,
+            teamPlay: prev.actionType === 'start' ? teamOffence : prev.teamPlay,
+            changeOffence: prev.actionType === 'start' ? false : prev.changeOffence,
+        }));
+    };
+    
+
+    const handleViolationChange = (event) => {
+        // violationInfo.violationType = event.target.value;
+        const violationType = event.target.value;
+
+        // Update violationInfo state
+        setViolationInfo((prev) => ({
+            ...prev,
+            violationType,
+        }));
+
+        fetchLastPlay(plays);
+        if (playInfo.teamPosition === 'offensive'){
+            const turnOverType = turnOverTypes.find((type) => type.value === violationType);
+
+            if (turnOverType) {
+                // Update turnOverInfo state
+                setTurnOverInfo((prev) => ({
+                    ...prev,
+                    turnOverType: turnOverType.value,
+                    category: turnOverType.category,
+                }));
+
+                // Update playInfo state based on category
+                setPlayInfo((prev) => ({
+                    ...prev,
+                    teamPlay: prev.teamOffence,
+                    changeOffence: turnOverType.category === 'team',
+                }));
+            }
+        } else {
+            playInfo.changeOffence = false
+            playInfo.teamPlay = playInfo.teamOffence === 'home' ? 'away' : 'home';
+        }
+    };
+
+    const handleTurnOverChange = (event) => {
+        const turnOverType = event.target.value;
+    
+        // Update turnOverInfo state safely
+        setTurnOverInfo((prev) => ({
+            ...prev,
+            turnOverType,
+        }));
+    
+        // Determine category dynamically and update playInfo
+        const turnoverCategory = turnOverTypes.find((type) => type.value === turnOverType)?.category;
+    
+        if (turnoverCategory === 'team') {
+            setPlayInfo((prev) => ({
+                ...prev,
+                changeOffence: true,
+            }));
+        }
+    };
+    
+    
+    const handleSubstitutionChange = (event) => {
         setSubstitutionInfo({...substitutionInfo, playerIn: event.target.value})
     }
 
-    const handleStealChange = async (event) => {
+    const handleStealChange = (event) => {
         setStealInfo({ ...stealInfo, stealType: event.target.value });
     }
-    
-    const handlePlayerAction = async (event) => {
-        if (playInfo.actionType === 'shot') {
-            setShotInfo({ ...shotInfo, player: event.target.value });
-        } else if (playInfo.actionType === 'turnover') {
-            setPlayInfo({...playInfo, changeOffence: true});
-            if (turnOverInfo.type !== 'steal') {
-                setPlayInfo({...playInfo, changeOffence: true});
-            }
-        } else if (playInfo.actionType === 'substitution') {
-            setSubstitutionInfo({ ...substitutionInfo, playerOut: event.target.value });
-        }
-    }
 
-    const handleFoulChange = async (event) => {
+    const handlePlayerAction = (event) => {
+        const playerValue = event.target.value;
+    
+        if (playInfo.actionType === 'shot') {
+            // Update shotInfo state
+            setShotInfo((prev) => ({
+                ...prev,
+                shotPlayer: playerValue,
+            }));
+        } else if (playInfo.actionType === 'turnover') {
+            // Update playInfo state for turnovers
+            setPlayInfo((prev) => ({
+                ...prev,
+                changeOffence: turnOverInfo.type !== 'steal',
+            }));
+        } else if (playInfo.actionType === 'substitution') {
+            // Update substitutionInfo state
+            setSubstitutionInfo((prev) => ({
+                ...prev,
+                playerOut: playerValue,
+            }));
+        }
+    };
+    
+
+    const handleFoulChange = (event) => {
         setFoulInfo({ ...foulInfo, playerFouled: event.target.value });
         if (foulInfo.foulClassification === 'offensive') {
             setPlayInfo({...playInfo, changeOffence: true});
@@ -530,71 +623,78 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
         }
     }
 
-    const handleDoubleFoulChange = async (event) => {
+    const handleDoubleFoulChange = (event) => {
         setFoulInfo({ ...foulInfo, player2: event.target.value });
         setPlayInfo({...playInfo, changeOffence: false});
     }
 
-    // const handleLocalSelect = (value) => {  
-    //     setSelectedLocals((prev) =>  
-    //         prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]  
-    //     );        
-    //     setShotInfo({
-    //         ...shotInfo,
-    //         player: value
-    //     });
-    // };  
-
-    // const handleAwaySelect = (value) => {  
-    //     setSelectedAways((prev) =>  
-    //         prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]  
-    //     );
-    //     setShotInfo({
-    //         ...shotInfo,
-    //         player: value
-    //     });
-    // };  
-
     const handleSubmit = async (event) => {
         event.preventDefault();
-        shotInfo.made && (playInfo.actionType === 'shot' || (playInfo.actionType === 'foul' && foulInfo.onShot )) ? addPoints(playInfo.teamOffence, shotInfo.points) && 
-            playInfo.teamOffence === 'home' ? playInfo.homeScore += shotInfo.points : playInfo.awayScore += shotInfo.points : '' ;
-        playInfo.time = time;
-        playInfo.shotClockTime = shotClockTime;
-        playInfo.actionType === 'shot' && shotInfo.made ? playInfo.changeOffence = true : shotInfo.continueOffence ? playInfo.changeOffence = false : playInfo.changeOffence = true;
-        const newPlay = {
-            ...cleanObject(playInfo),
-            ...cleanObject(violationInfo),
-            ...cleanObject(foulInfo),
-            ...cleanObject(substitutionInfo),
-            ...cleanObject(turnOverInfo),
-            ...cleanObject(stealInfo),
-            ...cleanObject(assistInfo),
-            ...cleanObject(reboundInfo),
-            ...cleanObject(blockInfo),
-            ...cleanObject(shotInfo),
-        };
-        // setPlays(...plays, newPlay); // Enviar la información al servidor
-        // Aquí puedes enviar la información del tiro al servidor
-        try {
-            await axios.post('/plays', { play: newPlay });
-            fetchPlays();
-            console.log('Jugada registrada exitosamente' + newPlay);
-        } catch (error) {
-            console.error('Error al registrar la jugada:', error);
-        }
-        setTeamPlayer(playInfo.teamOffence);
-        // Reinicia el formulario
-        resetAllStates();
-        if (playInfo.changeOffence){
-            setPlayInfo({teamOffence: playInfo.teamOffence === 'home' ? 'away' : 'home' });
-        } else {
-            setPlayInfo({teamOffence: playInfo.teamOffence});
-        }
-        setSelectedLocals([]);  
-        setSelectedAways([]);  
+        submitPlay();
     };
 
+    const submitPlay = async () => {
+        // Handle scoring logic
+        if (
+            shotInfo.made &&
+            (playInfo.actionType === 'shot' || (playInfo.actionType === 'foul' && foulInfo.onShot))
+        ) {
+            addPoints(playInfo.teamOffence, shotInfo.points);
+    
+            // Update team score based on teamOffence
+            if (playInfo.teamOffence === 'home') {
+                playInfo.homeScore += shotInfo.points;
+            } else {
+                playInfo.awayScore += shotInfo.points;
+            }
+        }
+    
+        // Update playInfo with the current time and shot clock
+        playInfo.time = time;
+        playInfo.shotClockTime = shotClockTime;
+    
+        // Handle possession changes after shots
+        if (playInfo.actionType === 'shot') {
+            if (shotInfo.made) {
+                playInfo.changeOffence = true;
+            } else if (shotInfo.continueOffence) {
+                playInfo.changeOffence = false;
+            } else {
+                playInfo.changeOffence = true;
+            }
+        }
+    
+        // Debugging log for key values
+        console.log(
+            `1, Violation: ${violationInfo.violationType}, ChangeOffence: ${playInfo.changeOffence}, TeamPlay: ${playInfo.teamPlay}, TeamOffence: ${playInfo.teamOffence}`
+        );
+    
+        // Construct the new play object
+        const newPlay = {
+            ...playInfo,
+            ...violationInfo,
+            ...foulInfo,
+            ...substitutionInfo,
+            ...turnOverInfo,
+            ...stealInfo,
+            ...assistInfo,
+            ...reboundInfo,
+            ...blockInfo,
+            ...shotInfo,
+        };
+    
+        // Send the play data to the server
+        try {
+            await axios.post('/plays', { play: newPlay });
+            fetchPlays(); // Refresh the plays list after submission
+        } catch (error) {
+            console.error('Error registering the play:', error);
+        }
+    
+        // Reset all states to prepare for the next play
+        resetAllStates();
+    };
+    
     
     const handleCourtClick = (event) => {    
         const svg = event.currentTarget;
@@ -615,51 +715,54 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
                 <div>
                     <div>
                         <label>Equipo ofensiva derecha: </label>
-                        <select value={team} onChange={setTeam(team)}>
+                        <select value={teamRight} onChange={(e) => setTeamRight(e.target.value)}>
                             <option value="home">Home</option>
                             <option value="away">Away</option>
                         </select>
                     </div>
                     <div>
+                        <div className='team-selector'>
+                            <label>Equipo en posesion: </label> 
+                            {/* setear posesion en base a la ultima accion */}
+                            <label><input type="radio" name="teamPlayer" value="home" checked={playInfo.teamOffence==="home"} onChange={handleTeamPlayerChange} disabled={playInfo.teamOffence !== '' ? playInfo.teamOffence === 'home' ? false : true : playInfo.actionType === 'start' ? false : true}/>Home</label>
+                            <label><input type="radio" name="teamPlayer" value="away" checked={playInfo.teamOffence==="away"} onChange={handleTeamPlayerChange} disabled={playInfo.teamOffence !== '' ? playInfo.teamOffence === 'away' ? false : true : playInfo.actionType === 'start' ? false : true}/>Away</label>
+                        </div>
                         <label>Action type: </label> 
                         <select value={playInfo.actionType} onChange={(e) => setPlayInfo({...playInfo, actionType: e.target.value})}>
                             <option value='' disabled>Select an option</option>
-                            {actionTypes.map((type, index) => (
+                            {actionTypes
+                                .filter(type => playInfo.teamOffence === '' || playInfo.actionType === 'start' || lastPlayInfo.actionType === 'endtime' ? type === 'start' : type !== 'start') // Excluir "start" si no se ha seleccionado un equipo
+                                .map((type, index) => (
                                     <option key={index} value={type}>
-                                        {type.charAt(0).toUpperCase() + type.slice(1)} {/* Capitaliza la primera letra */}
+                                        {type.charAt(0).toUpperCase() + type.slice(1)}
                                     </option>
                                 ))}
                         </select>
-                        <div style={{ display: playInfo.teamOffence !== '' ? 'flex' : 'none', flexDirection: 'row', marginLeft: '10px'}}>
-                            <label>Equipo en posesion: </label> 
-                            {/* setear posesion en base a la ultima accion */}
-                            <label style={{ marginRight: '10px' }}><input type="radio" name="teamPlayer" value="home" checked={playInfo.teamOffence==='home'} onChange={handleTeamPlayerChange}/>Home</label>
-                            <label style={{ marginRight: '10px' }}><input type="radio" name="teamPlayer" value="away" checked={playInfo.teamOffence==='away'} onChange={handleTeamPlayerChange} />Away</label>
-                        </div>
                         
                         <div>
-                            {playInfo.actionType === "violation" && (
+                            {(playInfo.actionType === "violation" || playInfo.actionType === 'timeout') && (
                                 <div>
                                     {/* Selector de Equipo de violacion si la misma es de tipo both */}
                                     <select
-                                        value={playInfo.team}
-                                        onChange={(e) => setPlayInfo({ ...playInfo, team: e.target.value })}
+                                        value={playInfo.teamPosition}
+                                        onChange={handleViolationTeamChange}
                                     >
                                         <option value="" disabled>Select Violation Team</option>                     
-                                        <option value="home">Home</option>
-                                        <option value="away">Away</option>
+                                        <option value="offensive">Offensive</option>
+                                        <option value="defensive">Defensive</option>
+                                        {playInfo.actionType === "violation" && <option value="both">Both</option>}
                                     </select>
                                     
 
                                     {/* Selector de Tipo de Violación */}
-                                    {playInfo.team && (
+                                    {playInfo.teamPosition != '' && playInfo.actionType === 'violation' && (
                                         <select
                                             value={violationInfo.violationType}
-                                            onChange={handleViolationChange()}
+                                            onChange={handleViolationChange}
                                         >
                                             <option value="" disabled>Select Violation Type</option>
                                             {violationTypes
-                                                .filter(type => type.classification === playInfo.team || type.classification === 'both') // Excluir "offensive" o "defensive" según el equipo
+                                                .filter(type => playInfo.teamPosition === 'both' ? type.classification === 'both' : type.classification === playInfo.teamPosition || type.selection === 'both' ) // Excluir "offensive" o "defensive" según el equipo
                                                 .map((violation, index) => (
                                                 <option key={index} value={violation.value}>
                                                     {violation.label}
@@ -676,7 +779,7 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
                                     {/* Selector de TurnOver Type */}
                                     <select
                                         value={turnOverInfo.turnOverType}
-                                        onChange={handleTurnOverChange()}
+                                        onChange={handleTurnOverChange}
                                     >
                                         <option value="" disabled>Select TurnOver Type</option>
                                         {/* Mostrar turnOverTypes que no sean de tipo "violation" */}
@@ -704,8 +807,9 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
                         
                         <div
                             style={{
-                                display: (playInfo.actionType === 'shot' || 
-                                        playInfo.actionType === 'turnover' || 
+                                display: ((playInfo.actionType === 'shot' && shotInfo.actionType !== '') || 
+                                        (playInfo.actionType === 'turnover'  && turnOverInfo.actionType !== '') || 
+                                        (playInfo.actionType === 'violation'  && violationInfo.actionType !== '' && violationInfo.category === 'personal' && playInfo.teamPosition === 'offensive') || 
                                         playInfo.actionType === 'substitution')
                                     ? 'flex' 
                                     : 'none',
@@ -713,41 +817,16 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
                                 marginLeft: '10px',
                             }}
                         >   
-                            {/* {[1, 2, 3, 4, 5].map(value => (  
-                                <label key={value} style={{ display: 'flex', alignItems: 'center' }}>  
-                                    <input  
-                                        type="radio"
-                                        name="player"  
-                                        value={value}  
-                                        checked={playInfo.teamOffence === 'home' && selectedLocals.includes(value)}  
-                                        onChange={() => handleLocalSelect(value)}  
-                                        disabled={playInfo.teamOffence !== 'home' && (playInfo.actionType === 'shot' || playInfo.actionType === 'turnover' || playInfo.actionType === 'substitution')}  
-                                    />  
-                                    {value}  
-                                </label>  
-                            ))}  
-                            {[1, 2, 3, 4, 5].map(value => (  
-                                <label key={value} style={{ display: 'flex', alignItems: 'center' }}>  
-                                    <input  
-                                        type="radio"  
-                                        name="player" 
-                                        value={value}  
-                                        checked={playInfo.teamOffence === 'away' && selectedAways.includes(value)}  
-                                        onChange={() => handleAwaySelect(value)}  
-                                        disabled={playInfo.teamOffence !== 'away' && (playInfo.actionType === 'shot' || playInfo.actionType === 'turnover' || playInfo.actionType === 'substitution')}  
-                                    />  
-                                    {value}  
-                                </label>  
-                            ))}   */}
                             <select
                                 value={
-                                    playInfo.actionType === 'shot' ? shotInfo.player :
-                                    playInfo.actionType === 'turnover' ? turnOverInfo.player :
+                                    playInfo.actionType === 'shot' ? shotInfo.shotPlayer :
+                                    playInfo.actionType === 'turnover' ? turnOverInfo.turnOverPlayer :
                                     playInfo.actionType === 'substitution' ? substitutionInfo.playerOut :
                                     ''
                                 } // Selecciona el valor correspondiente según el tipo de acción
                                 onChange={handlePlayerAction}
                             >
+                                <option value="" disabled>Select Player</option>
                                 {filteredPlayers
                                     .filter(player => player.onCourt && player.team === playInfo.teamOffence)
                                     .map(player => (
@@ -921,11 +1000,11 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
                                 </div>
                             )}
                         </div>
-                        {playInfo.changeOffence !== null && playInfo.actionType !== 'shot' && (<button type="submit" onSubmit={handleSubmit}>Registrar Jugada</button>)}
+                        {playInfo.changeOffence !== null && playInfo.actionType !== 'shot' && playInfo.actionType && (<button type="submit" onClick={handleSubmit}>Registrar Jugada</button>)}
                     </div>
                 </div>
             )}
-            <svg className="court" viewBox={viewBox} onClick={controller ? handleCourtClick : null} width="100%" height="100%" display={controller && (shotInfo.fouled || (playInfo.actionType === 'shot' && shotInfo.player)) ? 'block' : 'none'}>                
+            <svg className="court" viewBox={viewBox} onClick={controller && (shotInfo.fouled || (playInfo.actionType === 'shot' && shotInfo.player !== '')) ? handleCourtClick : null} width="100%" height="100%">                
                 
                 {/* Líneas triple izquierda*/}
                 <circle cx="157.5" cy="750" r="675" stroke="white" strokeWidth="5" fill="#f0a52d"  />
@@ -1045,23 +1124,23 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
                 {/* Toda la cancha */}
                 <line x1="0" y1="0" height="1500" width="2800" />
 
-                {controller === true && shotInfo.x !== null && shotInfo.y !== null && (
+                {controller === true && shotInfo.posx !== null && shotInfo.posy !== null && (
                     <g>
                         {/* Línea diagonal de la "X" */}
                         <line
-                            x1={shotInfo.x - 15}
-                            y1={shotInfo.y - 15}
-                            x2={shotInfo.x + 15}
-                            y2={shotInfo.y + 15}
+                            x1={shotInfo.posx - 15}
+                            y1={shotInfo.posy - 15}
+                            x2={shotInfo.posx + 15}
+                            y2={shotInfo.posy + 15}
                             stroke="red"
                             strokeWidth="5"
                         />
                         {/* Línea diagonal opuesta de la "X" */}
                         <line
-                            x1={shotInfo.x + 15}
-                            y1={shotInfo.y - 15}
-                            x2={shotInfo.x - 15}
-                            y2={shotInfo.y + 15}
+                            x1={shotInfo.posx + 15}
+                            y1={shotInfo.posy - 15}
+                            x2={shotInfo.posx - 15}
+                            y2={shotInfo.posy + 15}
                             stroke="red"
                             strokeWidth="5"
                         />
@@ -1069,11 +1148,11 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
                 )}
                 {/* Renderizar las marcas X donde se hizo clic */}  
                 {/* {clicks.map((click, index) => (  
-                    <text key={index} x={click.x} y={click.y} fill="red" fontSize="30">X</text>  
+                    <text key={index} x={click.posx} y={click.posy} fill="red" fontSize="30">X</text>  
                 ))}   */}
                                     
             </svg>
-            {controller=== true && shotInfo.x !== null && shotInfo.y !== null && playInfo.teamOffence !== null && shotInfo.player !== null &&(
+            {controller=== true && shotInfo.posx !== null && shotInfo.posy !== null && playInfo.teamOffence !== null && shotInfo.player !== null &&(
                 <form className="shot-form" onSubmit={handleSubmit}>
                     <h3>Detalles del Tiro</h3>
                     <label>Equipo: {playInfo.teamOffence}</label>
@@ -1162,7 +1241,9 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
                     
                     {plays && plays.map((play, index) => (
                         <li key={index}>
-                            {play.matchPlays}/{play.periodPlay} H {play.homeScore} - {play.awayScore} A, {play.period}-{play.time}-{play.shotClockTime}, Equipo: {play.teamOffence}, Jugador: {play.player}, {play.made ? 'Tiro Exitoso' : 'Tiro Fallido'}{play.made && play.assisted ? ', Asistente:' + play.assistplayer : ''}, Puntos: {play.points}, Posición: ({play.x}, {play.y})
+                            {play.matchPlays}/{play.periodPlay} H {play.homeScore} - {play.awayScore} A, {play.period}-{play.time}-{play.shotClockTime}, {play.actionType} {play.teamOffence} 
+                            {/* {play.teamPosition ? 'vs ' + play.teamPosition : ''} {play.violationType ? play.violationType : ''} {play.turnOverType ? play.turnOverType : ''} {play.shotType ? play.shotType : ''} {play.points ? play.points + ' puntos' : ''} {play.player ? 'Jugador: ' + play.player : ''} {play.assistType ? 'Asistente: ' + play.assistInfo.player : ''} {play.blockType ? 'Bloqueo: ' + play.blockInfo.player : ''} {play.reboundType ? 'Rebote: ' + play.reboundInfo.player : ''} {play.stealType ? 'Robo: ' + play.stealInfo.player : ''} {play.foulType ? 'Falta: ' + play.foulInfo.player : ''} {play.foulType === 'doubleFoul' ? 'Falta: ' + play.foulInfo.player + ' y ' + play.foulInfo.player2 : ''} {play.foulType === 'offensive' ? 'Falta: ' + play.foulInfo.player + ' en ataque' : ''} {play.foulType === 'defensive' ? 'Falta: ' + play.foulInfo.player + ' en defensa' : ''} {play.foulType === 'offensive' && play.foulInfo.onShot ? ' en tiro' : ''} {play.foulInfo.foulType === 'defensive' && play.foulInfo.onShot ? ' en tiro' : ''} {(play.shotInfo.posx && play.shotInfo.posy)? 'Posición: (' + play.shotInfo.posx + ',' + play.shotInfo.posy + ')' : ''} */}
+                            {/* Equipo: {play.teamOffence}, Jugador: {play.player}, {play.shotInfo.made ? 'Tiro Exitoso' : 'Tiro Fallido'}{play.shotInfo.made && play.shotInfo.assisted ? ', Asistente:' + play.assistInfo.player : ''}, Puntos: {play.shotInfo.points}, {play.shotInfo.posx && play.shotInfo.posy ? 'Posición: (' + play.shotInfo.posx + ',' + play.shotInfo.posy + ')' : ''} */}
                         </li>
                     ))}
                 </ul>

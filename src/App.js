@@ -199,7 +199,7 @@ function App() {
                             </div>
                             <Team name='away' score={awayScore} teamscoreboard={false} addPoints={addPoints} controller={true} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} fetchFouls={fetchFouls} fetchTimeOuts={fetchTimeOuts} fetchPosession={fetchPosession}></Team>
                         </div>
-                        <div className='title'>Registro de Tiros</div>
+                        <div className='title'>Registro de Jugadas</div>
                         <BasketballCourt time={time} shotClockTime={shotClockTime} period={period} homeScore={homeScore} awayScore={awayScore} addPoints={addPoints} controller={true} />
                         <div className='controls'><button onClick={resetScores}>Reset</button></div>
                         <div className='sign'>Powered by MDK SOLUTIONS</div>
