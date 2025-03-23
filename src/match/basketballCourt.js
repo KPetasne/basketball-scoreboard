@@ -72,7 +72,7 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
         { value: "jumpball", label: "Jump Ball", category: "team", validatePossession: true, classification: "both", selection: 'none', autoChangePossession: false },
         { value: "halfCourtViolation", label: "Half Court Violation", category: "team", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: true },
         { value: "backCourtViolation", label: "Back Court Violation", category: "team", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: true },
-        { value: "offensiveOutOfBounds", label: "Out of Bounds", category: "personal", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: false },
+        { value: "offensiveOutOfBounds", label: "Out of Bounds", category: "personal", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: true },
         { value: "defensiveOutOfBounds", label: "Out of Bounds", category: "team", validatePossession: false, classification: "defensive", selection: 'one', autoChangePossession: false },
         { value: "foul", label: "Foul", category: "personal", validatePossession: true, classification: "both", selection: 'both', autoChangePossession: true },
         { value: "laneViolation", label: "Lane Violation", category: "team", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: false },
@@ -340,8 +340,7 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
         setTeamPlayer('');
         
         setPlayInfo({
-            actionType: '', 
-            // teamOffence: '',
+            actionType: '',
             changeOffence: null,
             teamPosition: '',
             teamPlay: ''
@@ -486,16 +485,37 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
         });
     };
 
+    const handleActionTypeChange = (event) => {
+        const actionType = event.target.value;
+    
+        // Update playInfo state safely
+        
+        setPlayInfo((prev) => ({
+            ...prev,
+            actionType,
+        }));
+    }
+
     const handleViolationTeamChange = (event) => {
         const teamPosition = event.target.value;
     
         // Update playInfo state safely
+        if (playInfo.actionType === 'timeout'){
+            fetchLastPlay(plays)
+        }
         setPlayInfo((prev) => ({
             ...prev,
             teamPosition,
-            changeOffence: prev.actionType === 'timeout' ? false : prev.changeOffence,
-            teamOffence: prev.actionType === 'timeout' ? false : prev.teamOffence,
-            teamPlay: prev.actionType === 'timeout' ? false : teamPosition,
+            teamOffence: playInfo.actionType === 'timeout' ? prev.teamOffence : null,
+            changeOffence: playInfo.actionType === 'timeout' ? false : null,
+            teamPlay:
+                teamPosition === 'offensive'
+                    ? prev.teamOffence === 'home'
+                        ? 'away'
+                        : prev.teamOffence === 'away'
+                        ? 'away'
+                        : 'home'
+                    : null, // Handle non-offensive cases safely
         }));
     };
     
@@ -554,9 +574,18 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
                     changeOffence: turnOverType.category === 'team',
                 }));
             }
+        } else if (playInfo.teamPosition === 'defensive') {
+            setPlayInfo((prev) => ({
+                ...prev,
+                changeOffence: false,
+                teamPlay: prev.teamOffence === 'home' ? 'away' : 'home',
+            }));
         } else {
-            playInfo.changeOffence = false
-            playInfo.teamPlay = playInfo.teamOffence === 'home' ? 'away' : 'home';
+            setPlayInfo((prev) => ({
+                ...prev,
+                changeOffence: false,
+                teamPlay: 'both',
+            }));
         }
     };
 
@@ -571,11 +600,16 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
     
         // Determine category dynamically and update playInfo
         const turnoverCategory = turnOverTypes.find((type) => type.value === turnOverType)?.category;
-    
+        
         if (turnoverCategory === 'team') {
             setPlayInfo((prev) => ({
                 ...prev,
                 changeOffence: true,
+            }));
+        } else {
+            setPlayInfo((prev) => ({
+                ...prev,
+                teamOffence: prev.teamPlay,
             }));
         }
     };
@@ -666,7 +700,7 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
     
         // Debugging log for key values
         console.log(
-            `1, Violation: ${violationInfo.violationType}, ChangeOffence: ${playInfo.changeOffence}, TeamPlay: ${playInfo.teamPlay}, TeamOffence: ${playInfo.teamOffence}`
+            `1, Action: ${playInfo.actionType}, ChangeOffence: ${playInfo.changeOffence}, TeamPlay: ${playInfo.teamPlay}, TeamOffence: ${playInfo.teamOffence}`
         );
     
         // Construct the new play object
@@ -728,7 +762,7 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
                             <label><input type="radio" name="teamPlayer" value="away" checked={playInfo.teamOffence==="away"} onChange={handleTeamPlayerChange} disabled={playInfo.teamOffence !== '' ? playInfo.teamOffence === 'away' ? false : true : playInfo.actionType === 'start' ? false : true}/>Away</label>
                         </div>
                         <label>Action type: </label> 
-                        <select value={playInfo.actionType} onChange={(e) => setPlayInfo({...playInfo, actionType: e.target.value})}>
+                        <select value={playInfo.actionType} onChange={handleActionTypeChange}>
                             <option value='' disabled>Select an option</option>
                             {actionTypes
                                 .filter(type => playInfo.teamOffence === '' || playInfo.actionType === 'start' || lastPlayInfo.actionType === 'endtime' ? type === 'start' : type !== 'start') // Excluir "start" si no se ha seleccionado un equipo
