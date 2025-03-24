@@ -571,7 +571,7 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
                 setPlayInfo((prev) => ({
                     ...prev,
                     teamPlay: prev.teamOffence,
-                    changeOffence: turnOverType.category === 'team',
+                    changeOffence: turnOverType.category === 'team' ? true : null,
                 }));
             }
         } else if (playInfo.teamPosition === 'defensive') {
@@ -592,35 +592,48 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
     const handleTurnOverChange = (event) => {
         const turnOverType = event.target.value;
     
+        const turnoverCategory = turnOverTypes.find((type) => type.value === turnOverType)?.category;
         // Update turnOverInfo state safely
         setTurnOverInfo((prev) => ({
             ...prev,
             turnOverType,
+            category: turnoverCategory
+        }));
+
+            // Update playInfo state based on category
+        setPlayInfo((prev) => ({
+            ...prev,
+            teamPlay: prev.teamOffence,
         }));
     
         // Determine category dynamically and update playInfo
-        const turnoverCategory = turnOverTypes.find((type) => type.value === turnOverType)?.category;
-        
-        if (turnoverCategory === 'team') {
-            setPlayInfo((prev) => ({
-                ...prev,
-                changeOffence: true,
-            }));
-        } else {
-            setPlayInfo((prev) => ({
-                ...prev,
-                teamOffence: prev.teamPlay,
-            }));
-        }
     };
     
+    const handleSubstitutionTeamChange = (event) => {
+        setPlayInfo((prev) => ({
+            ...prev,
+            teamPlay: event.target.value,
+        }));
+    }
     
     const handleSubstitutionChange = (event) => {
         setSubstitutionInfo({...substitutionInfo, playerIn: event.target.value})
+        setPlayInfo((prev) => ({
+            ...prev,
+            changeOffence: false,
+        }));
     }
 
     const handleStealChange = (event) => {
         setStealInfo({ ...stealInfo, stealType: event.target.value });
+    }
+
+    const handleStealPlayerChange = (event) => {
+        setStealInfo({ ...stealInfo, stealPlayer: event.target.value });
+        setPlayInfo((prev) => ({
+            ...prev,
+            changeOffence: true,
+        }));
     }
 
     const handlePlayerAction = (event) => {
@@ -636,7 +649,11 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
             // Update playInfo state for turnovers
             setPlayInfo((prev) => ({
                 ...prev,
-                changeOffence: turnOverInfo.type !== 'steal',
+                changeOffence: turnOverInfo.type !== 'steal' ? true : null,
+            }));
+            setTurnOverInfo((prev) => ({
+                ...prev,
+                turnOverPlayer: playerValue,
             }));
         } else if (playInfo.actionType === 'substitution') {
             // Update substitutionInfo state
@@ -808,6 +825,19 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
                                     
                                 </div>
                             )}
+                            {playInfo.actionType === "substitution" && (
+                                <div>
+                                    {/* Selector de Equipo de violacion si la misma es de tipo both */}
+                                    <select
+                                        value={playInfo.teamPlay}
+                                        onChange={handleSubstitutionTeamChange}
+                                    >
+                                        <option value="" disabled>Select Substitution Team</option>                     
+                                        <option value="home">Home</option>
+                                        <option value="away">Away</option>
+                                    </select>
+                                </div>
+                            )}
                             {playInfo.actionType === "turnover" && (
                                 <div>
                                     {/* Selector de TurnOver Type */}
@@ -841,10 +871,10 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
                         
                         <div
                             style={{
-                                display: ((playInfo.actionType === 'shot' && shotInfo.actionType !== '') || 
-                                        (playInfo.actionType === 'turnover'  && turnOverInfo.actionType !== '') || 
-                                        (playInfo.actionType === 'violation'  && violationInfo.actionType !== '' && violationInfo.category === 'personal' && playInfo.teamPosition === 'offensive') || 
-                                        playInfo.actionType === 'substitution')
+                                display: ((playInfo.actionType === 'shot' && shotInfo.shotType !== '') || 
+                                        (playInfo.actionType === 'turnover'  && turnOverInfo.category === 'personal') || 
+                                        (playInfo.actionType === 'violation'  && turnOverInfo.category === 'personal') || 
+                                        playInfo.actionType === 'substitution' && playInfo.teamPlay !== '')
                                     ? 'flex' 
                                     : 'none',
                                 flexDirection: 'row',
@@ -902,13 +932,13 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
                                             </option>
                                         ))}
                                     </select>
-                                    <label>Jugador que ingresa:
-                                    <select value={substitutionInfo.playerIn} onChange={handleSubstitutionChange}>
-                                        <option value="" disabled>Select Player In</option>
+                                    <label>Jugador que recupero:
+                                    <select value={stealInfo.stealPlayer} onChange={handleStealPlayerChange}>
+                                        <option value="" disabled>Select Steal Player</option>
                                         {players
                                             .filter(
                                                 (player) =>
-                                                    player.team === playInfo.teamOffence && !player.onCourt // Filtrar solo los jugadores en el banco del equipo actual
+                                                    player.team !== playInfo.teamOffence && player.onCourt // Filtrar solo los jugadores en el banco del equipo actual
                                             )
                                             .map((player) => (
                                                 <option key={player.id} value={player.name}>
@@ -955,7 +985,7 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
                                                 ))}
                                         </select>
                                     </label>
-                                    {(foulInfo.foulClassification !== "doubleFoul") && (
+                                    {(foulInfo.foulClassification !== "doubleFoul" && foulInfo.foulClassification !== '') && (
                                         <>
                                             {/* Jugador que comete la falta */}
                                             <label>
@@ -1268,6 +1298,67 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
                     {shotInfo.player && playInfo.teamOffence && shotInfo.points && (<button type="submit">Registrar Tiro</button>)}
                 </form>
             )}
+            <div style={{ display: 'flex', gap: '20px', maxHeight: '300px' }}>
+                {/* Columna izquierda: Home */}
+                <div style={{ flex: 1, overflowY: 'scroll', border: '1px solid #ccc', padding: '10px' }}>
+                    <h2>Home Team Plays</h2>
+                    <ul style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
+                        {plays
+                            .filter((play) => play.teamPlay === 'home')
+                            .slice(0, 10) // Mostrar hasta 10 jugadas
+                            .map((play, index) => (
+                                <li
+                                    key={`home-${index}`}
+                                    style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        padding: '5px 0',
+                                        borderBottom: index < 9 ? '1px solid #eee' : 'none',
+                                    }}
+                                >
+                                    <span><b>Action:</b> {play.actionType}</span>
+                                    <span><b>Score:</b> {play.homeScore} - {play.awayScore}</span>
+                                    {play.actionType === 'shot' && <span>{play.shotPlayer} {play.points}pts {play.assistPlayer}</span>}
+                                    {play.actionType === 'foul' && <span>{play.playerFouled}</span>}
+                                    {play.actionType === 'substitution' && (
+                                        <span><b>Subs:</b> {play.playerOut} ↔ {play.playerIn}</span>
+                                    )}
+                                </li>
+                            ))}
+                    </ul>
+                </div>
+
+                {/* Columna derecha: Away */}
+                <div style={{ flex: 1, overflowY: 'scroll', border: '1px solid #ccc', padding: '10px' }}>
+                    <h2>Away Team Plays</h2>
+                    <ul style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
+                        {plays
+                            .filter((play) => play.teamPlay === 'away')
+                            .slice(0, 10) // Mostrar hasta 10 jugadas
+                            .map((play, index) => (
+                                <li
+                                    key={`away-${index}`}
+                                    style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        padding: '5px 0',
+                                        borderBottom: index < 9 ? '1px solid #eee' : 'none',
+                                    }}
+                                >
+                                    <span><b>Action:</b> {play.actionType}</span>
+                                    <span><b>Score:</b> {play.homeScore} - {play.awayScore}</span>
+                                    {play.actionType === 'shot' && <span>{play.shotPlayer} {play.points}pts {play.assistPlayer}</span>}
+                                    {play.actionType === 'foul' && <span>{play.playerFouled}</span>}
+                                    {play.actionType === 'substitution' && (
+                                        <span><b>Subs:</b> {play.playerOut} ↔ {play.playerIn}</span>
+                                    )}
+                                </li>
+                            ))}
+                    </ul>
+                </div>
+            </div>
+
+
 
             <div className="plays-list">
                 <h3>Tiros Registrados</h3>
