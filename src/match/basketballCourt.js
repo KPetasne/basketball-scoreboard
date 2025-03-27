@@ -2,6 +2,8 @@ import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import './BasketballCourt.css';
 import { ONE_MINUTE, ONE_SECOND, INTERVAL_MS } from './gameConstants';
+import actionTypes from './model/basketball/actionTypes';
+import violationTypes from './model/basketball/violationTypes';
 
 const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awayScore, addPoints}) => {
 
@@ -51,42 +53,11 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
         teamPosition: '',
         teamPlay: ''
     });
-
-    const actionTypes = [
-        "violation", 
-        "turnover", 
-        "shot", 
-        "start", 
-        "endtime", 
-        "substitution", 
-        "timeout", 
-        "miscelaneous",
-    ];
     
     const [violationInfo, setViolationInfo] = useState({
         violationType: '', // 'jumpball' || 'shotClockEnd' || 'halfCourtViolation' || 'backCourtViolation' || 'outOfBounds' || 'foul' || 'laneViolation' || 'doubleDribble' || 'travel' || 'threeSeconds' || 'fiveSeconds' || 'tenSeconds' || 'shotClockViolation' || 'illegalScreen' || 'offensiveGoaltending' || 'defensiveGoaltending' || 'kickedBall' || 'delayOfGame' || 'illegalDefense' || 'technical' || 'flagrant' || 'doublefoul' || 'triplefoul' || 'unsportsmanlike' || 'disqualifying' || 'personal' || 'team'
         violationPlayer: '',
     });    
-
-    const violationTypes = [
-        { value: "jumpball", label: "Jump Ball", category: "team", validatePossession: true, classification: "both", selection: 'none', autoChangePossession: false },
-        { value: "halfCourtViolation", label: "Half Court Violation", category: "team", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: true },
-        { value: "backCourtViolation", label: "Back Court Violation", category: "team", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: true },
-        { value: "offensiveOutOfBounds", label: "Out of Bounds", category: "personal", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: true },
-        { value: "defensiveOutOfBounds", label: "Out of Bounds", category: "team", validatePossession: false, classification: "defensive", selection: 'one', autoChangePossession: false },
-        { value: "foul", label: "Foul", category: "personal", validatePossession: true, classification: "both", selection: 'both', autoChangePossession: true },
-        { value: "laneViolation", label: "Lane Violation", category: "team", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: false },
-        { value: "doubleDribble", label: "Double Dribble", category: "personal", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: true },
-        { value: "travel", label: "Travel", category: "personal", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: true },
-        { value: "threeSeconds", label: "Three Seconds", category: "team", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: true },
-        { value: "fiveSeconds", label: "Five Seconds", category: "team", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: true },
-        { value: "shotClockViolation", label: "Shot Clock Violation", category: "team", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: true },
-        { value: "offensiveGoaltending", label: "Offensive Goaltending", category: "team", validatePossession: false, classification: "offensive", selection: 'one', autoChangePossession: true },
-        { value: "defensiveGoaltending", label: "Defensive Goaltending", category: "team", validatePossession: false, classification: "defensive", selection: 'one', autoChangePossession: true },
-        { value: "kickedBall", label: "Kicked Ball", category: "personal", validatePossession: true, classification: "none", selection: 'both', autoChangePossession: true },
-        { value: "delayOfGame", label: "Delay of Game", category: "team", validatePossession: false, classification: "none", selection: 'both', autoChangePossession: true },
-        { value: "illegalDefense", label: "Illegal Defense", category: "team", validatePossession: false, classification: "defensive", selection: 'one', autoChangePossession: false },
-    ];
     
     const [foulInfo, setFoulInfo] = useState({
         foulClassification: '', // 'offensive' || 'defensive'
@@ -480,7 +451,7 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
     const handleInputChange = (event) => {
         const { name, value, type, checked } = event.target;
         setShotInfo({
-            ...shotInfo,
+            ...event.shotInfo,
             [name]: type === 'checkbox' ? checked : value
         });
     };
@@ -1224,7 +1195,7 @@ const BasketballCourt = ({controller,time,shotClockTime,period,homeScore,awaySco
                     <label>Tiro de: {shotInfo.points} puntos</label>
                     <label>Distancia: {shotInfo.distanceFromHoop} metros</label>
                     <label>Tipo de Tiro: {shotInfo.shotType}</label>
-                    <label>¿Tiro Exitoso? <input type="checkbox" name="made" checked={shotInfo.made} onChange={handleInputChange} /></label>
+                    <label>¿Tiro Exitoso? <input type="checkbox" name="made" checked={shotInfo.made} onChange={(e) => {handleInputChange({...e, shotInfo})}} /></label>
                     {shotInfo.made ? (
                         <label>
                             Assist:
