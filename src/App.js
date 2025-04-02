@@ -8,7 +8,7 @@ import GamePeriod from './match/gamePeriod.js';
 import GamePosession from './match/gamePosession.js';
 import { TEN_MINUTES, ONE_MINUTE,LONG_SHOTCLOCK,SHORT_SHOTCLOCK, FIVE_SECOND,ONE_SECOND,INTERVAL_MS } from './match/gameConstants.js';
 import {LoginButton,LogoutButton,Profile} from './log/log.js';
-import BasketballCourt from './match/basketballCourt.js';
+import GameStats from './match/gameStats.js';
 
 import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
 const domain = process.env.REACT_APP_AUTH0_DOMAIN || "dev-u3c555b5wr3ui240.us.auth0.com"; 
@@ -32,6 +32,7 @@ function App() {
     const [board, setBoard] = useState(1);
     const [boardTeam, setBoardTeam] = useState(1);
     const [courtView, setCourtView] = useState(false);
+    const [playToPlayView, setPlayToPlayView] = useState(false);
 
     useEffect(() => {
         const fetchAllData = async () => {
@@ -118,6 +119,10 @@ function App() {
         setCourtView(event.target.checked);
     };
 
+    const handlePlayToPlayView = (event) => {
+        setPlayToPlayView(event.target.checked);
+    };
+
     return (
 
         <div className="App">
@@ -130,6 +135,7 @@ function App() {
                     <option value="3">Format 3 - Team</option>
                 </select>
                  Court View <input type="checkbox" name="courtview" onChange={handleCourtView}/>
+                 Play To Play View <input type="checkbox" name="playtoplayview" onChange={handlePlayToPlayView}/>
             </div>
             <div className="board">
                 {board === 2 && (
@@ -176,7 +182,10 @@ function App() {
                 <ShotClock name='shot-clock' shotClockTime={shotClockTime} timer={time} controller={false} />
             </div>
             {courtView === true && (
-                <BasketballCourt time={time} shotClockTime={shotClockTime} period={period} homeScore={homeScore} awayScore={awayScore} addPoints={addPoints} controller={false} />
+                <GameStats time={time} shotClockTime={shotClockTime} period={period} homeScore={homeScore} awayScore={awayScore} addPoints={addPoints} controller={false} view={'court'} />
+            )}
+            {playToPlayView === true && (
+                <GameStats time={time} shotClockTime={shotClockTime} period={period} homeScore={homeScore} awayScore={awayScore} addPoints={addPoints} controller={false} view={'playtoplay'} />
             )}
             {!isAuthenticated ? ( 
                 <LoginButton /> 
@@ -200,7 +209,7 @@ function App() {
                             <Team name='away' score={awayScore} teamscoreboard={false} addPoints={addPoints} controller={true} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} fetchFouls={fetchFouls} fetchTimeOuts={fetchTimeOuts} fetchPosession={fetchPosession}></Team>
                         </div>
                         <div className='title'>Registro de Jugadas</div>
-                        <BasketballCourt time={time} shotClockTime={shotClockTime} period={period} homeScore={homeScore} awayScore={awayScore} addPoints={addPoints} controller={true} />
+                        <GameStats time={time} shotClockTime={shotClockTime} period={period} homeScore={homeScore} awayScore={awayScore} addPoints={addPoints} controller={true} />
                         <div className='controls'><button onClick={resetScores}>Reset</button></div>
                         <div className='sign'>Powered by MDK SOLUTIONS</div>
                     </div>

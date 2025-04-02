@@ -1,51 +1,17 @@
-import React from 'react';
-import axios from 'axios';
-import './player.css';
+const players = [
+    { id: 1, name: 'Player 1', team: 'home', onCourt: true, points: '', rebounds: '', assists:'', fouls:'', turnOvers:'', steals:'', fg:'', f3: '', f2: '', f1:'', ft: '', time: '' },
+    { id: 2, name: 'Player 2', team: 'home', onCourt: true, points: '', rebounds: '', assists:'', fouls:'', turnOvers:'', steals:'', fg:'', f3: '', f2: '', f1:'', ft: '', time: ''  },
+    { id: 3, name: 'Player 3', team: 'home', onCourt: true, points: '', rebounds: '', assists:'', fouls:'', turnOvers:'', steals:'', fg:'', f3: '', f2: '', f1:'', ft: '', time: ''  },
+    { id: 4, name: 'Player 4', team: 'home', onCourt: true, points: '', rebounds: '', assists:'', fouls:'', turnOvers:'', steals:'', fg:'', f3: '', f2: '', f1:'', ft: '', time: ''  },
+    { id: 5, name: 'Player 5', team: 'home', onCourt: true, points: '', rebounds: '', assists:'', fouls:'', turnOvers:'', steals:'', fg:'', f3: '', f2: '', f1:'', ft: '', time: ''  },
+    { id: 6, name: 'Player 6', team: 'home', onCourt: false, points: '', rebounds: '', assists:'', fouls:'', turnOvers:'', steals:'', fg:'', f3: '', f2: '', f1:'', ft: '', time: ''  },
+    { id: 1, name: 'Player 1', team: 'away', onCourt: false, points: '', rebounds: '', assists:'', fouls:'', turnOvers:'', steals:'', fg:'', f3: '', f2: '', f1:'', ft: '', time: ''  },
+    { id: 2, name: 'Player 2', team: 'away', onCourt: true, points: '', rebounds: '', assists:'', fouls:'', turnOvers:'', steals:'', fg:'', f3: '', f2: '', f1:'', ft: '', time: ''  },
+    { id: 3, name: 'Player 3', team: 'away', onCourt: true, points: '', rebounds: '', assists:'', fouls:'', turnOvers:'', steals:'', fg:'', f3: '', f2: '', f1:'', ft: '', time: ''  },
+    { id: 4, name: 'Player 4', team: 'away', onCourt: true, points: '', rebounds: '', assists:'', fouls:'', turnOvers:'', steals:'', fg:'', f3: '', f2: '', f1:'', ft: '', time: ''  },
+    { id: 5, name: 'Player 5', team: 'away', onCourt: true, points: '', rebounds: '', assists:'', fouls:'', turnOvers:'', steals:'', fg:'', f3: '', f2: '', f1:'', ft: '', time: ''  },
+    { id: 6, name: 'Player 6', team: 'away', onCourt: true, points: '', rebounds: '', assists:'', fouls:'', turnOvers:'', steals:'', fg:'', f3: '', f2: '', f1:'', ft: '', time: ''  },
+];
 
-function Players({ teamname }) {
 
-    // Ejemplo de uso
-    const players = [
-        { number: 1, name: 'MDK', points: 15, rebounds: 5, assists: 7, fouls: 2 },
-        { number: 2, name: 'MADEKA', points: 10, rebounds: 6, assists: 3, fouls: 4 },
-        { number: 3, name: 'MK', points: 8, rebounds: 4, assists: 2, fouls: 3 },
-        { number: 4, name: 'MARTIN', points: 15, rebounds: 1, assists: 1, fouls: 2 },
-        { number: 5, name: 'KRASNY', points: 15, rebounds: 1, assists: 1, fouls: 2 },
-        { number: 6, name: 'MDK', points: 15, rebounds: 5, assists: 7, fouls: 2 },
-        { number: 7, name: 'MADEKA', points: 10, rebounds: 6, assists: 3, fouls: 4 },
-        { number: 8, name: 'MK', points: 8, rebounds: 4, assists: 2, fouls: 3 },
-        { number: 9, name: 'MARTIN', points: 15, rebounds: 1, assists: 1, fouls: 2 },
-        { number: 10, name: 'KRASNY', points: 15, rebounds: 1, assists: 1, fouls: 2 },
-        { number: 11, name: 'MDK', points: 15, rebounds: 5, assists: 7, fouls: 2 },
-        { number: 22, name: 'MADEKA', points: 10, rebounds: 6, assists: 3, fouls: 4 },
-        { number: 13, name: 'MK', points: 8, rebounds: 4, assists: 2, fouls: 3 },
-        { number: 14, name: 'MARTIN', points: 15, rebounds: 1, assists: 1, fouls: 2 },
-        { number: 15, name: 'KRASNY', points: 15, rebounds: 1, assists: 1, fouls: 2 },
-        // Agrega más jugadores según sea necesario
-    ];
-    
-    return (      
-        <div className="statistics-panel">
-            <div className="playertitle">
-                <div className="playernumber">N</div>
-                <div className="playername">NAME</div>
-                <div className="playerpoints">P</div>
-                <div className="playerrebounds">R</div>
-                <div className="playerassists">A</div>
-                <div className="playerfouls">F</div>
-            </div>
-            {players.map((player, index) => (
-                <div key={index} className="player">
-                    <div className="playernumber">{player.number}</div>
-                    <div className="playername">{player.name}</div>
-                    <div className="playerpoints">{player.points}</div>
-                    <div className="playerrebounds">{player.rebounds}</div>
-                    <div className="playerassists">{player.assists}</div>
-                    <div className="playerfouls">{player.fouls}</div>
-                </div>
-            ))}
-        </div>
-    );
-}
-
-export default Players;
+module.exports = players;

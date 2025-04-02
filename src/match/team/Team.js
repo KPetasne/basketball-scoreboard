@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import './Team.css';
-import Player from './player/player.js';
+import PlayersStatistics from '../views/pleyerStatistics';
 
 function Team({ name, score, addPoints, controller, homeTeam, fouls, timeOuts, fetchFouls, fetchTimeOuts, fetchPosession, teamscoreboard }) {
 
@@ -47,7 +47,7 @@ function Team({ name, score, addPoints, controller, homeTeam, fouls, timeOuts, f
                 //         </div>
                 //     ))}
                 // </div>
-                <Player teamname={name}></Player>
+                <PlayersStatistics teamname={name} />
             )}
             {teamscoreboard === false && (
                 <div className="team">
