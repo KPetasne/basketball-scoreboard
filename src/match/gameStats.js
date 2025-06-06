@@ -37,7 +37,8 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
     };
 
     const [playInfo, setPlayInfo] = useState({
-        actionType: '', 
+        actionType: '',
+        actionName: '',
         teamOffence: '',
         changeOffence: null,
         time: formatTime(time),
@@ -116,6 +117,7 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
         setPlayInfo({
             ...playInfo,
             actionType: '',
+            actionName: '',
             changeOffence: null,
             teamPosition: '',
             teamPlay: ''
@@ -191,10 +193,18 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
         return () => clearInterval(interval);
     }, []);
 
+    useEffect(() => {
+        console.log("Updated Info: " + JSON.stringify({playInfo, violationInfo, foulInfo, substitutionInfo, turnOverInfo, reboundInfo, shotInfo, assistInfo, blockInfo, stealInfo }, null, 2));
+    }, [playInfo, violationInfo, foulInfo, substitutionInfo, turnOverInfo, reboundInfo, shotInfo, assistInfo, blockInfo, stealInfo]); // Run whenever playInfo changes
+
     const fetchPlays = async () => {
-        const response = await axios.get('/plays');
-        setPlays(response.data.plays);
-        // fetchLastPlay(response.data.plays);
+        try {
+            const response = await axios.get('/plays');
+            setPlays(response.data.plays);
+            fetchLastPlay(response.data.plays);
+        } catch (error) {
+            console.error("Error fetching plays:", error);
+        }
     };
 
     const fetchLastPlay = (plays) => {
@@ -237,12 +247,11 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
         const actionType = event.target.value;
     
         // Update playInfo state safely
-        
-        setPlayInfo((prev) => ({
-            ...prev,
-            actionType,
-        }));
-        console.log("handleActionTypeChange: " + JSON.stringify(playInfo, null, 2));
+        setPlayInfo(prev => {
+            const updatedPlayInfo = { ...prev, actionType };
+            console.log("handleActionTypeChange: " + JSON.stringify(updatedPlayInfo, null, 2));
+            return updatedPlayInfo;
+        });
     }
 
     const handleViolationTeamChange = (event) => {
@@ -255,7 +264,6 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
         setPlayInfo((prev) => ({
             ...prev,
             teamPosition,
-            teamOffence: playInfo.actionType === 'timeout' ? prev.teamOffence : null,
             changeOffence: playInfo.actionType === 'timeout' ? false : null,
             teamPlay:
                 teamPosition === 'offensive'
@@ -286,75 +294,82 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
     const handleTeamPlayerChange = (event) => {
         const teamOffence = event.target.value;
     
-        // Update playInfo state safely using setPlayInfo
-        setPlayInfo((prev) => ({
+        setPlayInfo(prev => ({
             ...prev,
             teamOffence,
             teamPlay: prev.actionType === 'start' ? teamOffence : prev.teamPlay,
-            changeOffence: prev.actionType === 'start' ? false : prev.changeOffence,
+            changeOffence: prev.actionType === 'start' ? false : prev.changeOffence
         }));
+    
         console.log("handleTeamPlayerChange: " + JSON.stringify(playInfo, null, 2));
     };
     
 
     const handleViolationChange = (event) => {
-        // violationInfo.violationType = event.target.value;
-        const violationType = event.target.value;
-
-        // Update violationInfo state
-        setViolationInfo((prev) => ({
-            ...prev,
-            violationType,
-        }));
-
-        fetchLastPlay(plays);
-        if (playInfo.teamPosition === 'offensive'){
-            const turnOverType = turnOverTypes.find((type) => type.value === violationType);
-
+        const violationType = violationTypes.find(type => type.value === event.target.value); // Retrieve violation details
+    
+        if (!violationType) return; // Ensure the violation type is valid
+    
+        setViolationInfo(prev => ({ ...prev, violationType: violationType.value }));
+    
+        fetchLastPlay(plays); // Ensure the latest play is reflected
+    
+        const turnOverType = turnOverTypes.find(type => type.value === violationType.value);
+    
+        if (playInfo.teamPosition === "offensive") {
             if (turnOverType) {
-                // Update turnOverInfo state
-                setTurnOverInfo((prev) => ({
-                    ...prev,
-                    turnOverType: turnOverType.value,
-                    category: turnOverType.category,
-                }));
-
-                // Update playInfo state based on category
-                setPlayInfo((prev) => ({
+                setTurnOverInfo(prev => ({ ...prev, turnOverType: turnOverType.value, category: turnOverType.category }));
+    
+                setPlayInfo(prev => ({
                     ...prev,
                     teamPlay: prev.teamOffence,
-                    changeOffence: turnOverType.category === 'team' ? true : null,
+                    changeOffence: turnOverType.category === "team" ? true : null,
                 }));
             }
-        } else if (playInfo.teamPosition === 'defensive') {
-            setPlayInfo((prev) => ({
+        } else if (playInfo.teamPosition === "defensive") {
+            setPlayInfo(prev => ({
                 ...prev,
-                changeOffence: false,
-                teamPlay: prev.teamOffence === 'home' ? 'away' : 'home',
+                teamPlay: prev.teamOffence === "home" ? "away" : "home",
+                changeOffence: !violationType.postInformation ? false : null,
             }));
+    
+            // Handle Defensive Goaltending properly
+            if (violationType.value === "defensiveGoaltending") {
+                setPlayInfo(prev => ({
+                    ...prev,
+                    teamPlay: prev.teamOffence,
+                }));
+    
+                setShotInfo(prev => ({
+                    ...prev,
+                    made: true,
+                    continueOffence: false
+                }));
+            }
         } else {
-            setPlayInfo((prev) => ({
+            setPlayInfo(prev => ({
                 ...prev,
-                changeOffence: false,
-                teamPlay: 'both',
+                teamPlay: "both",
             }));
         }
-        console.log("handleViolationChange: " + JSON.stringify(playInfo, null, 2));
+    
+        console.log("handleViolationChange:", JSON.stringify({ playInfo, shotInfo, foulInfo, turnOverInfo }, null, 2));
     };
+    
 
     const handleTurnOverChange = (event) => {
         const turnOverType = event.target.value;
     
         const turnOverCategory = turnOverTypes.find((type) => type.value === turnOverType)?.category;
         // Update turnOverInfo state safely
-        setTurnOverInfo((prev) => ({
+        setTurnOverInfo(prev => ({
             ...prev,
             turnOverType,
             category: turnOverCategory
         }));
 
             // Update playInfo state based on category
-        setPlayInfo((prev) => ({
+        setPlayInfo(prev => ({
             ...prev,
             teamPlay: prev.teamOffence,
         }));
@@ -364,7 +379,7 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
     };
     
     const handleSubstitutionTeamChange = (event) => {
-        setPlayInfo((prev) => ({
+        setPlayInfo(prev => ({
             ...prev,
             teamPlay: event.target.value,
         }));
@@ -372,7 +387,7 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
     }
     
     const handleSubstitutionChange = (event) => {
-        setSubstitutionInfo({...event.substitutionInfo, playerIn: event.target.value})
+        setSubstitutionInfo(prev => ({...prev, playerIn: event.target.value}))
         setPlayInfo((prev) => ({
             ...prev,
             changeOffence: false,
@@ -382,22 +397,75 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
 
     const handleStealChange = (event) => {
         setStealInfo({ ...event.stealInfo, stealType: event.target.value });
+        setPlayInfo(prev => ({
+            ...prev,
+        }));
         console.log("handleStealChange: " + JSON.stringify(playInfo, null, 2));
     }
     
     const handleShotTypeChange = (event) => {
-        setShotInfo({ ...event.shotInfo, shotType: event.target.value });
-        setPlayInfo({...event.playInfo,teamPlay: playInfo.teamOffence, teamPosition: 'offensive'})
+        setShotInfo(prev => ({ ...prev, shotType: event.target.value }));
+        setPlayInfo(prev => ({...prev,teamPlay: playInfo.teamOffence, teamPosition: 'offensive'}))
         console.log("handleShotTypeChange: " + JSON.stringify(playInfo, null, 2));
     }
 
     const handleStealPlayerChange = (event) => {
-        setStealInfo({ ...event.stealInfo, stealPlayer: event.target.value });
-        setPlayInfo((prev) => ({
+        setStealInfo(prev => ({ ...prev, stealPlayer: event.target.value }));
+        setPlayInfo(prev => ({
             ...prev,
             changeOffence: true,
         }));
         console.log("handleStealPlayerChange: " + JSON.stringify(playInfo, null, 2));
+    }
+
+    const handleAssistChange = (event) => {
+        setAssistInfo(prev => ({ ...prev, assistType: event.target.value }));
+        setPlayInfo(prev => ({
+            ...prev,
+        }));
+        console.log("handleAssistChange: " + JSON.stringify(playInfo, null, 2));
+    }
+
+    const handleAssistPlayerChange = (event) => {
+        setAssistInfo(prev => ({ ...prev, assistPlayer: event.target.value }));
+        setPlayInfo(prev => ({
+            ...prev,
+            changeOffence: true,
+        }));
+        console.log("handleAssistPlayerChange: " + JSON.stringify(playInfo, null, 2));
+    }
+
+    const handleBlockChange = (event) => {
+        setBlockInfo(prev => ({ ...prev, blockType: event.target.value }));
+        setPlayInfo(prev => ({
+            ...prev,
+        }));
+        console.log("handleBlockChange: " + JSON.stringify(playInfo, null, 2));
+    }
+
+    const handleBlockPlayerChange = (event) => {
+        setBlockInfo(prev => ({ ...prev, blockPlayer: event.target.value }));
+        setPlayInfo(prev => ({
+            ...prev,
+        }));
+        console.log("handleBlockPlayerChange: " + JSON.stringify(playInfo, null, 2));
+    }
+
+    const handleReboundChange = (event) => {
+        setReboundInfo(prev => ({ ...prev, reboundType: event.target.value }));
+        setPlayInfo(prev => ({
+            ...prev,
+        }));
+        console.log("handleReboundChange: " + JSON.stringify(playInfo, null, 2));
+    }
+
+    const handleReboundPlayerChange = (event) => {
+        setReboundInfo(prev => ({ ...prev, reboundPlayer: event.target.value }));
+        setPlayInfo(prev => ({
+            ...prev,
+            changeOffence: true,
+        }));
+        console.log("handleReboundPlayerChange: " + JSON.stringify(playInfo, null, 2));
     }
 
     const handlePlayerAction = (event) => {
@@ -405,31 +473,31 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
         console.log(playerValue);
         if (playInfo.actionType === 'shot') {
             // Update shotInfo state
-            setShotInfo((prev) => ({
+            setShotInfo(prev => ({
                 ...prev,
                 shotPlayer: playerValue,
             }));
         } else if (playInfo.actionType === 'turnover') {
             // Update playInfo state for turnovers
-            setTurnOverInfo((prev) => ({
+            setTurnOverInfo(prev => ({
                 ...prev,
                 turnOverType: 'steal',
                 turnOverPlayer: playerValue,
             }));
         } else if (playInfo.actionType === 'violation') {
             // Update playInfo state for turnovers
-            setTurnOverInfo((prev) => ({
+            setTurnOverInfo(prev => ({
                 ...prev,
                 turnOverType: 'violation',
                 turnOverPlayer: playerValue,
             }));
-            setPlayInfo((prev) => ({
+            setPlayInfo(prev => ({
                 ...prev,
                 changeOffence: true,
             }));
         }else if (playInfo.actionType === 'substitution') {
             // Update substitutionInfo state
-            setSubstitutionInfo((prev) => ({
+            setSubstitutionInfo(prev => ({
                 ...prev,
                 playerOut: playerValue,
             }));
@@ -439,17 +507,17 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
     
 
     const handleFoulChange = (event) => {
-        setFoulInfo({ ...event.foulInfo, playerFouled: event.target.value });
+        setFoulInfo(prev => ({ ...prev, playerFouled: event.target.value }));
         if (foulInfo.foulClassification === 'offensive') {
-            setPlayInfo({...event.playInfo, changeOffence: true});
+            setPlayInfo(prev => ({...prev, changeOffence: true}));
         }else if (foulInfo.foulClassification === 'defensive' && !foulInfo.onShot) {
-            setPlayInfo({...event.playInfo, changeOffence: false});
+            setPlayInfo(prev => ({...prev, changeOffence: false}));
         }
     }
 
     const handleDoubleFoulChange = (event) => {
-        setFoulInfo({ ...event.foulInfo, player2: event.target.value });
-        setPlayInfo({...event.playInfo, changeOffence: false});
+        setFoulInfo(prev => ({ ...prev, player2: event.target.value }));
+        setPlayInfo(prev => ({...prev, changeOffence: false}));
         console.log("handleDoubleFoulChange: " + JSON.stringify(playInfo, null, 2));
     }
 
@@ -533,7 +601,7 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
                             <label><input type="radio" name="teamPlayer" value="away" checked={playInfo.teamOffence==="away"} onChange={handleTeamPlayerChange} disabled={playInfo.teamOffence !== '' ? playInfo.teamOffence === 'away' ? false : true : playInfo.actionType === 'start' ? false : true}/>Away</label>
                         </div>
                         <label>Action type: </label> 
-                        <select value={playInfo.actionType} onChange={handleActionTypeChange}>
+                        <select value={playInfo.actionType} onChange={(e) => handleActionTypeChange({...e,playInfo})}>
                             <option value='' disabled>Select an option</option>
                             {actionTypes
                                 .filter(action => playInfo.teamOffence === '' || playInfo.actionType === 'start' || lastPlayInfo.actionType === 'endtime' ? action.value === 'start' : action.value !== 'start') // Excluir "start" si no se ha seleccionado un equipo
@@ -550,7 +618,7 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
                                     {/* Selector de Equipo de violacion si la misma es de tipo both */}
                                     <select
                                         value={playInfo.teamPosition}
-                                        onChange={handleViolationTeamChange}
+                                        onChange={(e) => handleViolationTeamChange({...e,violationInfo})}
                                     >
                                         <option value="" disabled>Select Violation Team</option>                     
                                         <option value="offensive">Offensive</option>
@@ -563,7 +631,7 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
                                     {playInfo.teamPosition != '' && playInfo.actionType === 'violation' && (
                                         <select
                                             value={violationInfo.violationType}
-                                            onChange={handleViolationChange}
+                                            onChange={(e) => handleViolationChange({...e,violationInfo})}
                                         >
                                             <option value="" disabled>Select Violation Type</option>
                                             {violationTypes
@@ -584,7 +652,7 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
                                     {/* Selector de Equipo de violacion si la misma es de tipo both */}
                                     <select
                                         value={playInfo.teamPlay}
-                                        onChange={handleSubstitutionTeamChange}
+                                        onChange={(e) => handleSubstitutionTeamChange({...e,substitutionInfo})}
                                     >
                                         <option value="" disabled>Select Substitution Team</option>                     
                                         <option value="home">Home</option>
@@ -597,7 +665,7 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
                                     {/* Selector de TurnOver Type */}
                                     <select
                                         value={turnOverInfo.turnOverType}
-                                        onChange={handleTurnOverChange}
+                                        onChange={(e) => handleTurnOverChange({...e,turnOverInfo})}
                                     >
                                         <option value="" disabled>Select TurnOver Type</option>
                                         {/* Mostrar turnOverTypes que no sean de tipo "violation" */}
@@ -611,7 +679,7 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
                                     </select>
                                 </div>
                             )}
-                            {playInfo.actionType === "shot" && (
+                            {(playInfo.actionType === "shot" || (playInfo.actionType === "violation" && violationInfo.violationType === "defensiveGoaltending")) && (
                                 <select value={shotInfo.shotType} onChange={(e) => handleShotTypeChange({...e,shotInfo})}>
                                     <option value="" disabled>Select Shot Type</option>
                                     {shotTypes.map((type, index) => (
@@ -628,6 +696,7 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
                                 display: ((playInfo.actionType === 'shot' && shotInfo.shotType !== '') || 
                                         (playInfo.actionType === 'turnover' ) || 
                                         (playInfo.actionType === 'violation' && playInfo.teamPosition === 'offensive' && turnOverInfo.category === 'personal') || 
+                                        (playInfo.actionType === 'violation' && violationInfo.violationType === 'foul') || 
                                         playInfo.actionType === 'substitution' && playInfo.teamPlay !== '')
                                     ? 'flex' 
                                     : 'none',
@@ -635,25 +704,27 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
                                 marginLeft: '10px',
                             }}
                         >   
-                            <select
-                                value={
-                                    playInfo.actionType === 'shot' ? shotInfo.shotPlayer :
-                                    playInfo.actionType === 'turnover' ? turnOverInfo.turnOverPlayer :
-                                    playInfo.actionType === 'violation' ? turnOverInfo.turnOverPlayer :
-                                    playInfo.actionType === 'substitution' ? substitutionInfo.playerOut :
-                                    ''
-                                } // Selecciona el valor correspondiente según el tipo de acción
-                                onChange={(e) => handlePlayerAction({...e})}
-                            >
-                                <option value="" disabled>Select Player</option>
-                                {players
-                                    .filter(player => player.onCourt && player.team === playInfo.teamOffence)
-                                    .map(player => (
-                                        <option key={player.id} value={player.name}>
-                                            {player.name}
-                                        </option>
-                                    ))}
-                            </select>
+                            {(playInfo.actionType === 'shot' || playInfo.actionType === 'turnover' || playInfo.actionType === 'violation' || playInfo.actionType === 'substitution') && 
+                                <select
+                                    value={
+                                        playInfo.actionType === 'shot' ? shotInfo.shotPlayer :
+                                        playInfo.actionType === 'turnover' ? turnOverInfo.turnOverPlayer :
+                                        playInfo.actionType === 'violation' ? turnOverInfo.turnOverPlayer :
+                                        playInfo.actionType === 'substitution' ? substitutionInfo.playerOut :
+                                        ''
+                                    } // Selecciona el valor correspondiente según el tipo de acción
+                                    onChange={(e) => handlePlayerAction({...e, shotInfo})}
+                                >
+                                    <option value="" disabled>Select Player</option>
+                                    {players
+                                        .filter(player => player.onCourt && player.team === playInfo.teamPlay) // Filtrar jugadores en la cancha del equipo ofensivo
+                                        .map(player => (
+                                            <option key={player.id} value={player.name}>
+                                                {player.name}
+                                            </option>
+                                        ))}
+                                </select>
+                            }
                             {playInfo.actionType === 'substitution' && substitutionInfo.playerOut && (
                             <div style={{ display: 'flex', flexDirection: 'row', marginLeft: '10px' }}>
                                 <label>Jugador que ingresa:
@@ -836,8 +907,8 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
                     {shotInfo.made ? (
                         <label>
                             Assist:
-                            <select value={assistInfo.assistType} onChange={(e) => e.value === 'none' ? shotInfo.assisted = false : setAssistInfo({...assistInfo, assistType: e.target.value})}>
-                                <option value='Select Rebound Type' disabled>Select an option</option>
+                            <select value={assistInfo.assistType} onChange={(e) => e.value === 'none' ? shotInfo.assisted = false : handleAssistChange({...e,assistInfo})}>
+                                <option value='Select Assist Type' disabled>Select an option</option>
                                 {assistTypes.map((type, index) => (
                                     <option key={index} value={type}>
                                         {type.charAt(0).toUpperCase() + type.slice(1)} {/* Capitaliza la primera letra */}
@@ -845,7 +916,7 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
                                 ))}
                             </select>
                             {assistInfo.assistType !== "false" && (
-                                <select value={assistInfo.player} onChange={(e) => setAssistInfo({...assistInfo, assistPlayer: e.target.value})}>
+                                <select value={assistInfo.player} onChange={(e) => handleAssistPlayerChange({...e,assistInfo})}>
                                     <option value="" disabled>Select Player Assist</option>
                                     {players
                                         .filter(player => player.onCourt && player.name !== shotInfo.player ) // Excluir al jugador que anotó
@@ -861,7 +932,7 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
                     ) : (
                         <label>
                             Block:
-                            <select value={shotInfo.continueOffence ? 'offensive' : 'defensive'} onChange={(e) => shotInfo.blocked = value && setBlockInfo({...blockInfo, blockType: e.target.value})}>
+                            <select value={shotInfo.continueOffence ? 'offensive' : 'defensive'} onChange={(e) => shotInfo.blocked = value && handleBlockChange({...e,blockInfo})}>
                                 <option value='' disabled>Select Block Type</option>
                                 {blockTypes.map((type, index) => (
                                     <option key={index} value={type}>
@@ -869,7 +940,7 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
                                     </option>
                                 ))}
                             </select>
-                            <select value={reboundInfo.player} onChange={(e) => setBlockInfo({...blockInfo, blockPlayer: e.target.value})}>
+                            <select value={reboundInfo.player} onChange={(e) => handleBlockPlayerChange({...e,blockInfo})}>
                                 <option value='' disabled>Select player Rebound</option>
                                 {players
                                     .filter(player =>  player.onCourt && player.team !== playInfo.teamOffence) // Excluir al jugador que anotó
@@ -881,7 +952,7 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
                                 }
                             </select>
                             Rebote:
-                            <select value={shotInfo.continueOffence ? 'offensive' : 'defensive'} onChange={(e) => shotInfo.rebounded = value && setReboundInfo({...reboundInfo, reboundType: e.target.value})}>
+                            <select value={shotInfo.continueOffence ? 'offensive' : 'defensive'} onChange={(e) => shotInfo.rebounded = value && handleReboundChange({...e,reboundInfo})}>
                                 <option value='' disabled>Select Rebound Type</option>
                                 {reboundTypes.map((type, index) => (
                                     <option key={index} value={type}>
@@ -889,7 +960,7 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
                                     </option>
                                 ))}
                             </select>
-                            <select value={reboundInfo.player} onChange={(e) => setReboundInfo({...reboundInfo, player: e.target.value})}>
+                            <select value={reboundInfo.player} onChange={(e) => handleReboundPlayerChange({...e,reboundInfo})}>
                                 <option value='' disabled>Select player Rebound</option>
                                 {players
                                     .filter(player => player.onCourt && player.team === shotInfo.continueOffence ? true : false) // Excluir al jugador que anotó
@@ -903,12 +974,12 @@ const GameStats = ({controller,time,shotClockTime,period,homeScore,awayScore, ad
                         </label>
                     )}
 
-                    {shotInfo.player && playInfo.teamOffence && shotInfo.points && (<button type="submit">Registrar Tiro</button>)}
+                    {shotInfo.shotPlayer && playInfo.teamOffence && shotInfo.points && (<button type="submit">Registrar Tiro</button>)}
                 </form>
             )}
             {(controller=== true || view === 'playtoplay') &&
                 <div>
-                    <PlayToPlayTable plays={plays} />
+                    <PlayToPlayTable formatTime={formatTime} plays={plays} />
                 </div>
             }
         </div>

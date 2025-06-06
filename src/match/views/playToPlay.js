@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import actionTypes from '../model/basketball/actionTypes';
 
-const PlayToPlayTable = ({ plays }) => {
+const PlayToPlayTable = ({ formatTime, plays }) => {
     const [selectedQuarter, setSelectedQuarter] = useState('all');
 
     // Filtrar jugadas según el cuarto seleccionado
@@ -69,7 +69,7 @@ const PlayToPlayTable = ({ plays }) => {
 
                         {/* Columna Time */}
                         <div style={{ textAlign: 'center', padding: '5px', fontWeight: 'bold' }}>
-                            {play.time}
+                            {formatTime(play.time)}
                         </div>
 
                         {/* Columna Away */}

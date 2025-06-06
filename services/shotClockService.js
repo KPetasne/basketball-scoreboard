@@ -44,18 +44,21 @@ const stopShotClock = (req, res) => {
 
 const resetShotClock = (req, res) => {
     const shotclock = req.body.shotclock;
-    const { remainingTimeActive } = require('./timerService.js');
-    const { isMatchTimerActive } = require('./timerService.js');
+    const { remainingTimeActive, isMatchTimerActive } = require('./timerService.js');
+
     if (remainingTimeActive <= shotclock) {
         shotClockClear();
-        shotClockTime = "-1";
+        shotClockTime = -1; // Ensure it's a number instead of a string
     } else {
         shotClockTime = shotclock;
-        if (!shotClockTimer && !isMatchTimerActive()) {
-            shotClockTimer = setInterval(updateShotClock, constants.INTERVAL_MS);
-        }
     }
-    res.json({ shotClockTime: shotClockTime });
+
+    // Only start shot clock timer if the match timer is active
+    if (!shotClockTimer && isMatchTimerActive()) {
+        shotClockTimer = setInterval(updateShotClock, constants.INTERVAL_MS);
+    }
+
+    res.json({ shotClockTime });
 };
 
 const remainingShotClockTimeActive = () => {
