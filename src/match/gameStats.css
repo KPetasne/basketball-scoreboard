@@ -1,0 +1,82 @@
+.court-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.court {
+    width: 800px;
+    height: 428px;
+    background-color: #f8c471;
+    border: 2px solid white;
+    cursor: pointer;
+}
+
+.shot-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #f9f9f9;
+    color: black;
+    margin: 10px;
+}
+
+.shot-form label {
+    margin-bottom: 10px;
+}
+
+.plays-list {
+    margin-top: 20px;
+    width: 500px;
+}
+
+.plays-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.plays-list li {
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.team-selector{
+    display: flex;
+    flex-direction: row;
+    margin: 10px;
+}
+
+.team-selector label {
+    margin-right: 10px;
+}
+
+.div {
+    display: flex;
+    gap: 20px;
+    max-height: 300px; /* Limitar la altura total de la vista */
+}
+
+.div > div {
+    flex: 1;
+    overflow-y: scroll; /* Habilitar scroll vertical */
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+.ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.li {
+    display: flex;
+    justify-content: space-between; /* Información organizada horizontalmente */
+    padding: 5px 0;
+    border-bottom: 1px solid #eee; /* Separador visual entre jugadas */
+}
+
+
+

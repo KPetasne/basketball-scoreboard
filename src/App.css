@@ -1,28 +1,109 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
 .App {
-  display: flex;
+  display: inline-block;
   justify-content: center;
   align-items: center;
   color: white;
   font-family: 'Orbitron', sans-serif;
+  width: 100%;
+}
+
+.board {
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+  display: inline-flex;
+  width: 100%;
+}
+
+.board-shot-clock{
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+  display: flow-root;
 }
 
 .scoreboard {
-  text-align: center;
-  width: 80%;
+  display: inline;
+  justify-content: center;
+  width: 100%;
 }
 
-.score {
-  background-color: black;
-  padding: 5px;
-  border: 1px solid white;
-  font-weight: bold;
+.gamescoreboard {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 1px 1px 20px 1px;
 }
 
-.timer {
+.teamscoreboard {
+  display: inline-flex;
+  justify-content: center;
+  width: 100%;
+  margin: 1px 1px 1px 1px;
+}
+
+.teamuniquescoreboard {
+  display: table-cell;
+  justify-content: center;
+  width: 100%;
+  margin: 1px 1px 1px 1px;
+}
+
+.match {
+  width: 50%;
+  display: inline-block;
+}
+
+.match .match-timer {
   margin: 10px;
-  display: block;
+  width: 200px;
+  display: inline-block;
+}
+
+.match .timer {
+  color: red;
+  padding: 5px;
+  font-weight: bold;
+  font-size: 3.5rem;
+}
+
+.match .perpo {
+  display: row;
+  width: 100%;
+}
+
+.period-container{
+    display: inline-block;
+    color: blue;
+    font-size: 2rem;
+    font-weight: bold;
+    width: 50%;
+}
+
+.posession-container{
+  display: inline-block;
+  color: orange;
+  font-size: 2rem;
+  font-weight: bold;
+  width: 25%;
+}
+
+.controller {
+  text-align: center;
+  background-color: grey;
+  width: 100%;
+}
+
+.controls {
+  text-align: center;
+  background-color: grey;
+  width: 100%;
+  display: inline-flex;
+  justify-content: center;
 }
 
 .controls button, .team button {
@@ -39,3 +120,26 @@
 .controls button:hover, .team button:hover {
   background-color: #61dafb;
 }
+
+.finish {
+  border: 3px;
+  border-color: #ff0000d6;
+}
+
+.title {
+  font-size: 3rem;
+  color: white;
+  font-weight: bold;
+  width: 100%;
+}  
+
+
+.sign {
+  font-size: 1.5rem;
+  color: white;
+  font-weight: bold;
+  align-items: right;
+  display: inline-block;
+  margin: 2px;
+  width: 100%;
+}  

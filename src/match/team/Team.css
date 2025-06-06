@@ -1,0 +1,71 @@
+/* @font-face {
+    font-family: 'CustomDots';
+    src: url('./path-to-your-custom-font.woff') format('woff');
+} */
+
+.gamescoreboard .team-container{
+    display: inline-block;
+    text-align: center;
+    width: 50%;
+}
+
+.teamscoreboard {
+    width: 25%;
+}
+
+.teamscoreboard .team-container {
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+}
+
+.team-container .team{
+    width: 100%;
+}
+
+.team-container .name {
+    font-size: 2.5rem;
+    color: green;
+    font-weight: bold;
+    display: inline-block;
+    width: 80%;
+}
+
+.team-container .score {
+    border: 1px solid white;
+    color: white;
+    font-size: 3rem;
+    font-weight: bold;
+    padding: 10px 1px 10px 1px;
+    margin: 1px 1px 5px 1px;
+    display: inline-block;
+    width: 80%;
+}
+
+.team-container .fouls {
+    color: yellow;
+    font-size: 1rem;
+    margin: 1px 1px 15px 1px;
+    font-weight: bold;
+    /* font-family: 'CustomDots'; */
+}
+
+.team-container .time-outs {
+    color: orange;
+    font-size: 1rem;
+    font-weight: bold;
+    /* font-family: 'CustomDots'; */
+}
+
+.team-container .controls {
+    text-align: center;
+    background-color: grey;
+    width: 100%;
+    display: inline-block;
+}
+
+.team-container .statistics-panel {
+    display: table-cell;
+    width: 100%;
+    text-align: center;
+}
