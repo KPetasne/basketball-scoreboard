@@ -30,6 +30,7 @@ function App() {
     const [homePosession, setHomePosession] = useState(null);
     const [awayPosession, setAwayPosession] = useState(null);
     const [board, setBoard] = useState(1);
+    const [control, setControl] = useState(1);
     const [boardTeam, setBoardTeam] = useState(1);
     const [courtView, setCourtView] = useState(false);
     const [playToPlayView, setPlayToPlayView] = useState(false);
@@ -109,6 +110,10 @@ function App() {
 
     const handleBoardChange = (event) => {
         setBoard(parseInt(event.target.value));
+    };
+
+    const handleControlChange = (event) => {
+        setControl(parseInt(event.target.value));
     };
 
     const handleBoardTeamChange = (event) => {
@@ -194,23 +199,38 @@ function App() {
                     <LogoutButton /> 
                     <Profile />
                     <div className="controller">
-                        <div className='title'>CONTROLLER</div>
-                        <div className="gamescoreboard">
-                            <Team name='home' score={homeScore} teamscoreboard={false} addPoints={addPoints} controller={true} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} fetchFouls={fetchFouls} fetchTimeOuts={fetchTimeOuts} fetchPosession={fetchPosession}></Team>          
-                            <div className="match">
-                                <GameTimer controller={true} time={time} fetchTime={fetchTime}></GameTimer>
-                                <div className="perpo">
-                                    <GamePosession controller="home" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
-                                    <GamePeriod controller={true} fetchPeriod={fetchPeriod} period={period}></GamePeriod>
-                                    <GamePosession controller="away" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
-                                </div>
-                                <ShotClock shotClockTime={shotClockTime} timer={time} controller={true} />
-                            </div>
-                            <Team name='away' score={awayScore} teamscoreboard={false} addPoints={addPoints} controller={true} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} fetchFouls={fetchFouls} fetchTimeOuts={fetchTimeOuts} fetchPosession={fetchPosession}></Team>
+                        <div className="control-selector">
+                            <label htmlFor="control-type">Select Control:</label>
+                            <select id="control-type" value={control} onChange={handleControlChange}>
+                                <option value="1">Format 1 - Board Controller</option>
+                                <option value="2">Format 2 - Action Controller</option>
+                            </select>
                         </div>
-                        <div className='title'>Registro de Jugadas</div>
-                        <GameStats time={time} shotClockTime={shotClockTime} period={period} homeScore={homeScore} awayScore={awayScore} addPoints={addPoints} controller={true} />
-                        <div className='controls'><button onClick={resetScores}>Reset</button></div>
+                        <div className='title'>CONTROLLER</div>
+                        {control === 1 && (
+                            <>
+                            <div className="gamescoreboard">
+                                <Team name='home' score={homeScore} teamscoreboard={false} addPoints={addPoints} controller={true} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} fetchFouls={fetchFouls} fetchTimeOuts={fetchTimeOuts} fetchPosession={fetchPosession}></Team>          
+                                <div className="match">
+                                    <GameTimer controller={true} time={time} fetchTime={fetchTime}></GameTimer>
+                                    <div className="perpo">
+                                        <GamePosession controller="home" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
+                                        <GamePeriod controller={true} fetchPeriod={fetchPeriod} period={period}></GamePeriod>
+                                        <GamePosession controller="away" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
+                                    </div>
+                                    <ShotClock shotClockTime={shotClockTime} timer={time} controller={true} />
+                                </div>
+                                <Team name='away' score={awayScore} teamscoreboard={false} addPoints={addPoints} controller={true} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} fetchFouls={fetchFouls} fetchTimeOuts={fetchTimeOuts} fetchPosession={fetchPosession}></Team>
+                            </div>
+                            <div className='controls'><button onClick={resetScores}>Reset</button></div>
+                        </>
+                        )}
+                        {control === 2 && (
+                            <>
+                                <div className='title'>Registro de Jugadas</div>
+                                <GameStats time={time} shotClockTime={shotClockTime} period={period} homeScore={homeScore} awayScore={awayScore} addPoints={addPoints} controller={true} />
+                            </>
+                        )}
                         <div className='sign'>Powered by MDK SOLUTIONS</div>
                     </div>
                 </> 
