@@ -138,15 +138,13 @@ function App() {
                 <> 
                     <LogoutButton /> 
                     <Profile />
-                    <div className="controller">
-                        <div className="control-selector">
-                            <label htmlFor="control-type">Select Control:</label>
-                            <select id="control-type" value={control} onChange={handleControlChange}>
-                                <option value="1">Format 1 - Score Board View</option>
-                                <option value="2">Format 2 - Board Controller</option>
-                                <option value="3">Format 3 - Action Controller</option>
-                            </select>
-                        </div>
+                    <div className="control-selector">
+                        <label htmlFor="control-type">Select Control:</label>
+                        <select id="control-type" value={control} onChange={handleControlChange}>
+                            <option value="1">Format 1 - Score Board View</option>
+                            <option value="2">Format 2 - Board Controller</option>
+                            <option value="3">Format 3 - Action Controller</option>
+                        </select>
                     </div>
                     {control === 1 && (
                         <>
@@ -214,21 +212,23 @@ function App() {
                     )}
                     {control === 2 && (
                         <>
-                        <div className='title'>CONTROLLER</div>
-                            <div className="gamescoreboard">
-                                <Team name='home' score={homeScore} teamscoreboard={false} addPoints={addPoints} controller={true} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} fetchFouls={fetchFouls} fetchTimeOuts={fetchTimeOuts} fetchPosession={fetchPosession}></Team>          
-                                <div className="match">
-                                    <GameTimer controller={true} time={time} fetchTime={fetchTime}></GameTimer>
-                                    <div className="perpo">
-                                        <GamePosession controller="home" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
-                                        <GamePeriod controller={true} fetchPeriod={fetchPeriod} period={period}></GamePeriod>
-                                        <GamePosession controller="away" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
+                        <div className="controller">
+                            <div className='title'>CONTROLLER</div>
+                                <div className="gamescoreboard">
+                                    <Team name='home' score={homeScore} teamscoreboard={false} addPoints={addPoints} controller={true} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} fetchFouls={fetchFouls} fetchTimeOuts={fetchTimeOuts} fetchPosession={fetchPosession}></Team>          
+                                    <div className="match">
+                                        <GameTimer controller={true} time={time} fetchTime={fetchTime}></GameTimer>
+                                        <div className="perpo">
+                                            <GamePosession controller="home" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
+                                            <GamePeriod controller={true} fetchPeriod={fetchPeriod} period={period}></GamePeriod>
+                                            <GamePosession controller="away" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
+                                        </div>
+                                        <ShotClock shotClockTime={shotClockTime} timer={time} controller={true} />
                                     </div>
-                                    <ShotClock shotClockTime={shotClockTime} timer={time} controller={true} />
+                                    <Team name='away' score={awayScore} teamscoreboard={false} addPoints={addPoints} controller={true} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} fetchFouls={fetchFouls} fetchTimeOuts={fetchTimeOuts} fetchPosession={fetchPosession}></Team>
                                 </div>
-                                <Team name='away' score={awayScore} teamscoreboard={false} addPoints={addPoints} controller={true} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} fetchFouls={fetchFouls} fetchTimeOuts={fetchTimeOuts} fetchPosession={fetchPosession}></Team>
-                            </div>
-                            <div className='controls'><button onClick={resetScores}>Reset</button></div>
+                                <div className='controls'><button onClick={resetScores}>Reset</button></div>
+                        </div>
                         </>
                     )}
                     {control === 3 && (
