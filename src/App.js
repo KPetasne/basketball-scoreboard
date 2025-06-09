@@ -138,66 +138,6 @@ function App() {
                 <> 
                     <LogoutButton /> 
                     <Profile />
-                    <div className="board-selector">
-                        <label htmlFor="board-type">Select Board Format:</label>
-                        <select id="board-type" value={board} onChange={handleBoardChange}>
-                            <option value="1">Format 1 - Scoreboard</option>
-                            <option value="2">Format 2 - Statistics</option>
-                            <option value="3">Format 3 - Team</option>
-                        </select>
-                        Court View <input type="checkbox" name="courtview" onChange={handleCourtView}/>
-                        Play To Play View <input type="checkbox" name="playtoplayview" onChange={handlePlayToPlayView}/>
-                    </div>
-                    <div className="board">
-                        {board === 2 && (
-                            <div className="teamscoreboard">
-                                <Team name='home' teamscoreboard={true}></Team>  
-                            </div>
-                        )}
-                        <div className="scoreboard">
-                            <div className='title'>MADEKA SPORTS</div>
-                            <div className='gamescoreboard'>
-                                
-                                <Team name='home' score={homeScore} addPoints={addPoints} controller={false} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} teamscoreboard={false}></Team>  
-                                <div className="match">
-                                    <GameTimer controller={false} time={time} fetchTime={fetchTime}></GameTimer>
-                                    <div className="perpo">
-                                        <GamePosession controller="home" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
-                                        <GamePeriod controller={false} fetchPeriod={fetchPeriod} period={period}></GamePeriod>
-                                        <GamePosession controller="away" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
-                                    </div>
-                                </div>
-                                <Team name='away' score={awayScore} addPoints={addPoints}  controller={false} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} teamscoreboard={false}></Team>
-                            </div>
-                            {board === 3 && (
-                                <div className="teamuniquescoreboard">
-                                    <div className="board-selector">
-                                        <label htmlFor="board-type">Select Team Board:</label>
-                                        <select id="board-type-team" value={boardTeam} onChange={handleBoardTeamChange}>
-                                            <option value="home">Home</option>
-                                            <option value="away">Away</option>
-                                        </select>
-                                    </div>
-                                    <Team name={boardTeam} teamscoreboard={true}></Team>  
-                                </div>
-                            )}
-                            <div className='sign'>Powered by MDK SOLUTIONS</div>
-                        </div>
-                        {board === 2 && (
-                            <div className="teamscoreboard">
-                                <Team name='away' teamscoreboard={true}></Team>
-                            </div>
-                        )}
-                    </div>
-                    <div className="board-shot-clock">
-                        <ShotClock name='shot-clock' shotClockTime={shotClockTime} timer={time} controller={false} />
-                    </div>
-                    {courtView === true && (
-                        <GameStats time={time} shotClockTime={shotClockTime} period={period} homeScore={homeScore} awayScore={awayScore} addPoints={addPoints} controller={false} view={'court'} />
-                    )}
-                    {playToPlayView === true && (
-                        <GameStats time={time} shotClockTime={shotClockTime} period={period} homeScore={homeScore} awayScore={awayScore} addPoints={addPoints} controller={false} view={'playtoplay'} />
-                    )}
                     <div className="controller">
                         <div className="control-selector">
                             <label htmlFor="control-type">Select Control:</label>
@@ -207,9 +147,74 @@ function App() {
                                 <option value="3">Format 3 - Action Controller</option>
                             </select>
                         </div>
+                    </div>
+                    {control === 1 && (
+                        <>
+                        <div className="board-selector">
+                            <label htmlFor="board-type">Select Board Format:</label>
+                            <select id="board-type" value={board} onChange={handleBoardChange}>
+                                <option value="1">Format 1 - Scoreboard</option>
+                                <option value="2">Format 2 - Statistics</option>
+                                <option value="3">Format 3 - Team</option>
+                            </select>
+                            Court View <input type="checkbox" name="courtview" onChange={handleCourtView}/>
+                            Play To Play View <input type="checkbox" name="playtoplayview" onChange={handlePlayToPlayView}/>
+                        </div>
+                        <div className="board">
+                            {board === 2 && (
+                                <div className="teamscoreboard">
+                                    <Team name='home' teamscoreboard={true}></Team>  
+                                </div>
+                            )}
+                            <div className="scoreboard">
+                                <div className='title'>MADEKA SPORTS</div>
+                                <div className='gamescoreboard'>
+                                    
+                                    <Team name='home' score={homeScore} addPoints={addPoints} controller={false} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} teamscoreboard={false}></Team>  
+                                    <div className="match">
+                                        <GameTimer controller={false} time={time} fetchTime={fetchTime}></GameTimer>
+                                        <div className="perpo">
+                                            <GamePosession controller="home" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
+                                            <GamePeriod controller={false} fetchPeriod={fetchPeriod} period={period}></GamePeriod>
+                                            <GamePosession controller="away" fetchPosession={fetchPosession} homePosession={homePosession} awayPosession={awayPosession}></GamePosession>
+                                        </div>
+                                    </div>
+                                    <Team name='away' score={awayScore} addPoints={addPoints}  controller={false} homeTeam={false} fouls={awayFouls} timeOuts={awayTimeOuts} teamscoreboard={false}></Team>
+                                </div>
+                                {board === 3 && (
+                                    <div className="teamuniquescoreboard">
+                                        <div className="board-selector">
+                                            <label htmlFor="board-type">Select Team Board:</label>
+                                            <select id="board-type-team" value={boardTeam} onChange={handleBoardTeamChange}>
+                                                <option value="home">Home</option>
+                                                <option value="away">Away</option>
+                                            </select>
+                                        </div>
+                                        <Team name={boardTeam} teamscoreboard={true}></Team>  
+                                    </div>
+                                )}
+                                <div className='sign'>Powered by MDK SOLUTIONS</div>
+                            </div>
+                            {board === 2 && (
+                                <div className="teamscoreboard">
+                                    <Team name='away' teamscoreboard={true}></Team>
+                                </div>
+                            )}
+                        </div>
+                        <div className="board-shot-clock">
+                            <ShotClock name='shot-clock' shotClockTime={shotClockTime} timer={time} controller={false} />
+                        </div>
+                        {courtView === true && (
+                            <GameStats time={time} shotClockTime={shotClockTime} period={period} homeScore={homeScore} awayScore={awayScore} addPoints={addPoints} controller={false} view={'court'} />
+                        )}
+                        {playToPlayView === true && (
+                            <GameStats time={time} shotClockTime={shotClockTime} period={period} homeScore={homeScore} awayScore={awayScore} addPoints={addPoints} controller={false} view={'playtoplay'} />
+                        )}
+                        </>
+                    )}
+                    {control === 2 && (
+                        <>
                         <div className='title'>CONTROLLER</div>
-                        {control === 2 && (
-                            <>
                             <div className="gamescoreboard">
                                 <Team name='home' score={homeScore} teamscoreboard={false} addPoints={addPoints} controller={true} homeTeam={true} fouls={homeFouls} timeOuts={homeTimeOuts} fetchFouls={fetchFouls} fetchTimeOuts={fetchTimeOuts} fetchPosession={fetchPosession}></Team>          
                                 <div className="match">
@@ -225,15 +230,18 @@ function App() {
                             </div>
                             <div className='controls'><button onClick={resetScores}>Reset</button></div>
                         </>
-                        )}
-                        {control === 3 && (
-                            <>
-                                <div className='title'>Registro de Jugadas</div>
-                                <GameStats time={time} shotClockTime={shotClockTime} period={period} homeScore={homeScore} awayScore={awayScore} addPoints={addPoints} controller={true} />
-                            </>
-                        )}
-                        <div className='sign'>Powered by MDK SOLUTIONS</div>
-                    </div>
+                    )}
+                    {control === 3 && (
+                        <div className="controller">
+                            {control === 3 && (
+                                <>
+                                    <div className='title'>Registro de Jugadas</div>
+                                    <GameStats time={time} shotClockTime={shotClockTime} period={period} homeScore={homeScore} awayScore={awayScore} addPoints={addPoints} controller={true} />
+                                </>
+                            )}
+                        </div>
+                    )}
+                    <div className='sign'>Powered by MDK SOLUTIONS</div>
                 </> 
             )}
         </div>
