@@ -2,7 +2,7 @@ const PeriodService = require('../services/periodService.js');
 const ScoreService = require('../services/scoreService.js');
 const TimerService = require('../services/timerService.js');
 const ShotClockService = require('../services/shotClockService.js');
-const constants = require('../services/constants.js');
+const constants = require('../model/constants.js');
 const { v4: uuidv4 } = require('uuid'); 
 const { prettyDOM } = require('@testing-library/react');
 

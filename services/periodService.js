@@ -4,7 +4,7 @@ const constShotClockService = require('../services/shotClockService.js');
 const constFoulService = require('../services/foulService.js');
 const constTimeOutService = require('../services/timeOutService.js');
 const constPosessionService = require('../services/posessionService.js');
-const constants = require('../services/constants.js');
+const constants = require('../model/constants.js');
 
 
 let period = 1;

@@ -1,4 +1,4 @@
-const constants = require('./constants.js');
+const constants = require('../model/constants.js');
 const constShotClockService = require('./shotClockService.js');
 
 let matchTimer = null;

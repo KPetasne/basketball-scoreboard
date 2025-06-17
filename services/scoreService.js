@@ -36,6 +36,7 @@ const getScore = (req, res) => {
     res.json(score);
 };
 
+//viejo
 const postScore = (req, res) => {
     const { team, points } = req.body;
     if (team === 'home') {
@@ -73,11 +74,43 @@ const postScore = (req, res) => {
     res.json({ home: homeScore, away: awayScore });
 };
 
+//nuevo
+const updateScore = (currentGame, gameAction) => {
+    const currentTeam = currentGame[gameAction.team];
+    const newTeamScore = currentTeam.score + gameAction.data.points;
+
+    const newTeam = {
+        currentTeam,
+        ...{score: newTeamScore}
+    }
+
+    const home = (gameAction.team == 'HOME') ? newTeam : currentGame.home;
+    const away = (gameAction.team == 'AWAY') ? newTeam : currentGame.away;
+
+    const newGame = {
+        currentGame,
+        ...{
+            home: home,
+            away: away,
+            actions: {
+                id: "generar_rnd",
+                type: gameAction.type,
+                team: gameAction.team,
+                time: gameAction.time,
+                events: []
+            }
+        }
+    }
+    return newGame
+}
+
+
 module.exports = {
     resetScore,
     getScore,
     postScore,
     currentScore,
+    updateScore,
     homeScore,
     awayScore
 };

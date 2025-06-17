@@ -1,4 +1,4 @@
-const constants = require('./constants.js');
+const constants = require('../model/constants.js');
 
 let shotClockTime = constants.LONG_SHOTCLOCK;
 let shotClockTimer = null;

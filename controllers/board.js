@@ -8,72 +8,7 @@ const PosessionService = require('../services/posessionService.js');
 const PlayService = require('../services/playServices.js');
 
 
-const constants = require('../services/constants.js');
-
-// const Game = require('./models/gameModel'); // Asegúrate de que la ruta es correcta
-
-// const saveGameState = async () => {
-//     const game = await Game.findOne({});
-//     if (game) {
-//         game.homeScore = homeScore;
-//         game.awayScore = awayScore;
-//         game.homeFouls = homeFouls;
-//         game.awayFouls = awayFouls;
-//         game.homeTimeOuts = homeTimeOuts;
-//         game.awayTimeOuts = awayTimeOuts;
-//         game.homePosession = homePosession;
-//         game.awayPosession = awayPosession;
-//         game.period = period;
-//         game.posession = posession;
-//         game.remainingTime = remainingTime;
-//         game.shotClockTime = shotClockTime;
-//         game.shotClockTimer = shotClockTimer !== null;
-//     } else {
-//         const newGame = new Game({
-//             homeScore,
-//             awayScore,
-//             homeFouls,
-//             awayFouls,
-//             homeTimeOuts,
-//             awayTimeOuts,
-//             homePosession,
-//             awayPosession,
-//             period,
-//             posession,
-//             remainingTime,
-//             shotClockTime,
-//             shotClockTimer: shotClockTimer !== null
-//         });
-//         await newGame.save();
-//     }
-// };
-
-// const loadGameState = async () => {
-//     const game = await Game.findOne({});
-//     if (game) {
-//         homeScore = game.homeScore;
-//         awayScore = game.awayScore;
-//         homeFouls = game.homeFouls;
-//         awayFouls = game.awayFouls;
-//         homeTimeOuts = game.homeTimeOuts;
-//         awayTimeOuts = game.awayTimeOuts;
-//         homePosession = game.homePosession;
-//         awayPosession = game.awayPosession;
-//         period = game.period;
-//         posession = game.posession;
-//         remainingTime = game.remainingTime;
-//         shotClockTime = game.shotClockTime;
-//         if (game.shotClockTimer) {
-//             shotClockTimer = setInterval(updateShotClock, constants.INTERVAL_MS);
-//         }
-//     }
-// };
-
-// // Llama a loadGameState al iniciar el servidor para cargar el estado del juego
-// loadGameState().then(() => {
-//     console.log('Estado del juego cargado');
-// });
-
+const constants = require('../model/constants.js');
 
 const reset = (req, res) => {
     ScoreService.resetScore();

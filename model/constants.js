@@ -5,6 +5,12 @@ const SHORT_SHOTCLOCK = 14000;
 const FIVE_SECOND = 5000;
 const ONE_SECOND = 1000;
 const INTERVAL_MS = 100;
+const GAME_START = {
+    gameID: "gameId",
+    home: { score: 0, fouls: 0, timeouts: 0 },
+    away: { score: 0, fouls: 0, timeouts: 0 },
+    actions: []
+  };
 
 module.exports = {
     TEN_MINUTES,
@@ -14,4 +20,5 @@ module.exports = {
     FIVE_SECOND,
     ONE_SECOND,
     INTERVAL_MS,
+    GAME_START
 };
