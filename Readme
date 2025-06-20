@@ -1,0 +1,43 @@
+🏀 Basketball Scoreboard App
+Esta aplicación es un marcador de baloncesto interactivo con un frontend en React y un backend en Node.js que utiliza Socket.IO para comunicación en tiempo real y Redis para la persistencia del estado del juego. La aplicación se despliega fácilmente usando Docker y Docker Compose.
+
+🚀 Cómo levantar la aplicación desde cero
+Sigue estos pasos para poner la aplicación en funcionamiento en tu entorno local.
+
+Requisitos
+Antes de comenzar, asegúrate de tener instalados los siguientes programas:
+
+Git: Para clonar el repositorio.
+
+Docker Desktop: Incluye Docker Engine y Docker Compose, necesarios para construir y ejecutar los contenedores.
+
+Instalación de Docker Desktop:
+
+Windows: Descarga e instala desde el sitio oficial de Docker.
+
+macOS: Descarga e instala desde el sitio oficial de Docker.
+
+Linux: Sigue las instrucciones específicas para tu distribución en la documentación oficial de Docker.
+
+1. Levantar la Aplicación con Docker Compose
+Una vez que estés en el directorio raíz del proyecto (basketball-scoreboard/), puedes construir y levantar todos los servicios (frontend, backend y Redis) con un solo comando de Docker Compose:
+
+docker-compose up --build
+
+¿Qué hace este comando?
+
+docker-compose up: Inicia los servicios definidos en el docker-compose.yml.
+
+--build: Fuerza la reconstrucción de las imágenes Docker para el frontend y el backend. Esto es crucial cuando haces cambios en el código de tu aplicación o en los package.json. Si no has hecho cambios y solo quieres levantar los contenedores ya construidos, puedes omitir --build.
+
+La primera vez que ejecutes este comando, Docker descargará las imágenes base (node:18, redis:7), instalará las dependencias de Node.js para el frontend y el backend, y construirá las imágenes personalizadas de tu aplicación. Este proceso puede tardar unos minutos.
+
+Verás la salida de los logs de los tres servicios (backend, frontend, redis) en tu terminal.
+
+2. Acceder a la Aplicación
+Una vez que todos los servicios estén corriendo (busca mensajes como "Servidor backend escuchando en el puerto 3000" y los logs de compilación del frontend finalizados), podrás acceder a la aplicación:
+
+Frontend (Aplicación React): Abre tu navegador web y ve a:
+http://localhost:3000
+
+Deberías ver la interfaz del marcador de baloncesto.
