@@ -58,6 +58,7 @@ io.on('connection', (socket) => {
   socket.on('game_action', async (action) => {
     const gameId = action.gameId;
     const key = `game:${gameId}`;
+    console.log('Nueva accion: ', action);
 
     try {
       // Obtener estado actual
@@ -65,13 +66,16 @@ io.on('connection', (socket) => {
       const game = current ? JSON.parse(current) : constants.GAME_START;
 
       switch (action.type){
-        case SCORE:
+        case 'SCORE':
             newGame = scoreService.updateScore(game, action);
             break;
-        case FOUL:
+        case 'FOUL':
             break;
-        case POSITION:
+        case 'POSITION':
             break;
+        default:
+          console.log("Type default: ", action.type);
+          break;
       }
 
       await redis.set(key, JSON.stringify(newGame));

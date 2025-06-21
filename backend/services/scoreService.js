@@ -76,31 +76,28 @@ const postScore = (req, res) => {
 
 //nuevo
 const updateScore = (currentGame, gameAction) => {
-    const currentTeam = currentGame[gameAction.team];
+    let currentTeam = currentGame[gameAction.team];
     const newTeamScore = currentTeam.score + gameAction.data.points;
+    currentTeam.score = newTeamScore
 
-    const newTeam = {
-        currentTeam,
-        ...{score: newTeamScore}
+    const home = (gameAction.team == 'HOME') ? currentTeam : currentGame.home;
+    const away = (gameAction.team == 'AWAY') ? currentTeam : currentGame.away;
+
+    const action = {
+        id: "generar_rnd",
+        type: gameAction.type,
+        team: gameAction.team,
+        time: gameAction.time,
+        events: []
     }
 
-    const home = (gameAction.team == 'HOME') ? newTeam : currentGame.home;
-    const away = (gameAction.team == 'AWAY') ? newTeam : currentGame.away;
+    let newGame = currentGame;
 
-    const newGame = {
-        currentGame,
-        ...{
-            home: home,
-            away: away,
-            actions: {
-                id: "generar_rnd",
-                type: gameAction.type,
-                team: gameAction.team,
-                time: gameAction.time,
-                events: []
-            }
-        }
-    }
+    newGame.home = home;
+    newGame.away = away;
+    console.log(newGame);
+    newGame.actions.push(action);
+
     return newGame
 }
 

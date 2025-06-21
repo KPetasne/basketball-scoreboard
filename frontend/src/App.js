@@ -9,6 +9,7 @@ import GamePosession from './match/gamePosession.js';
 import { TEN_MINUTES, ONE_MINUTE,LONG_SHOTCLOCK,SHORT_SHOTCLOCK, FIVE_SECOND,ONE_SECOND,INTERVAL_MS } from './match/gameConstants.js';
 import {LoginButton,LogoutButton,Profile} from './log/log.js';
 import GameStats from './match/gameStats.js';
+import { useSocket } from './context/SocketContext';
 
 import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
 const domain = process.env.REACT_APP_AUTH0_DOMAIN || "dev-u3c555b5wr3ui240.us.auth0.com"; 
@@ -17,6 +18,7 @@ const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID || "ABoNb46j1b4TRkNsuSK74
 
 function App() {
     const { isAuthenticated, isLoading } = useAuth0(); if (isLoading) { return <div>Loading ...</div>; }
+    const socket = useSocket();
     const [homeScore, setHomeScore] = useState(0);
     const [awayScore, setAwayScore] = useState(0);
     const [homeFouls, setHomeFouls] = useState(0);
@@ -36,8 +38,20 @@ function App() {
     const [playToPlayView, setPlayToPlayView] = useState(false);
 
     useEffect(() => {
+        if (!socket) return;
+
+        const handler = (data) => {
+            console.log('Recibido game_update:', data);
+            const home = data.home.score;
+            const away = data.away.score;
+            setHomeScore(home);
+            setAwayScore(away);
+        };
+
+        socket.on('game_update', handler);
+
         const fetchAllData = async () => {
-            await fetchScore();
+            //await fetchScore();
             await fetchTime();
             await fetchShotClock();
             await fetchFouls();
@@ -49,17 +63,44 @@ function App() {
             fetchAllData();
         }, INTERVAL_MS); // cada una decima de segundo actualiza la informacion
         return () => clearInterval(interval);
-    }, []);
+
+        return () => socket.off('game_update', handler);
+    }, [socket]);
+
+    const sendAction = (type, team, data) => {
+        if (!socket) return;
+
+        const gameId = "gameID01";
+    
+        const payload = {
+            gameId,
+            type,
+            team,
+            time: new Date().toISOString(),
+            data,
+            events: [],
+        };
+
+        console.log('frontend new action: ', payload);
+        socket.emit('game_action', payload);
+    };
 
     const fetchScore = async () => {
-        const response = await axios.get('/score');
-        setHomeScore(response.data.home);
-        setAwayScore(response.data.away);
+        //const response = await axios.get('/score');
+        home = gameState.home.score;
+        away = gameState.away.score;
+        setHomeScore(home);
+        setAwayScore(away);
     };
 
     const addPoints = async (team, points) => {
-        await axios.post('/score', { team, points });
-        fetchScore();
+        sendAction(
+            "SCORE",
+            team,
+            {"points": points}
+        )
+        //await axios.post('/score', { team, points });
+        //fetchScore();
     };
 
     const fetchFouls = async () => {
