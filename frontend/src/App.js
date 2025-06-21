@@ -76,7 +76,8 @@ function App() {
             gameId,
             type,
             team,
-            time: new Date().toISOString(),
+            time: time,
+            period: period,
             data,
             events: [],
         };
@@ -85,22 +86,14 @@ function App() {
         socket.emit('game_action', payload);
     };
 
-    const fetchScore = async () => {
-        //const response = await axios.get('/score');
-        home = gameState.home.score;
-        away = gameState.away.score;
-        setHomeScore(home);
-        setAwayScore(away);
-    };
-
     const addPoints = async (team, points) => {
         sendAction(
             "SCORE",
             team,
-            {"points": points}
+            {
+                "points": points
+            }
         )
-        //await axios.post('/score', { team, points });
-        //fetchScore();
     };
 
     const fetchFouls = async () => {

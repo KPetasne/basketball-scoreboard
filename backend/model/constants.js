@@ -12,6 +12,17 @@ const GAME_START = {
     actions: []
   };
 
+const GAME_SETTINGS = {
+  TEAMS: {
+    HOME: "HOME",
+    AWAY: "AWAY"
+  },
+  LEADER: {
+    TIE: "TIE",
+    CHANGE_EVENT: "CHANGE_LEADER_EVENT"
+  }
+}
+
 module.exports = {
     TEN_MINUTES,
     ONE_MINUTE,
@@ -20,5 +31,6 @@ module.exports = {
     FIVE_SECOND,
     ONE_SECOND,
     INTERVAL_MS,
-    GAME_START
+    GAME_START,
+    GAME_SETTINGS
 };
