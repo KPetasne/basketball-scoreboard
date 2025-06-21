@@ -1,7 +1,7 @@
 const { remainingTimeActive } = require("./timerService");
+const {GAME_SETTINGS} = require("../model/constants")
+const { v4: uuidv4 } = require('uuid');
 
-let homeScore = 0;
-let awayScore = 0;
 let homeLeadTime = 0; // Tiempo en el que homeScore estuvo arriba
 let awayLeadTime = 0; // Tiempo en el que awayScore estuvo arriba
 let leadChanges = 0; // Cantidad de cambios de líder
@@ -9,105 +9,106 @@ let lastLeader = ''; // Último líder marcador
 let ties = 0; // Cantidad de veces empatados
 let startTime = Date.now(); // Tiempo de inicio
 
-const resetScore = () => {
-    homeScore = 0;
-    awayScore = 0;
-    homeLeadTime = 0;
-    awayLeadTime = 0;
-    leadChanges = 0;
-    lastLeader = '';
-    ties = 0;
-    startTime = Date.now();
-};
-
-const currentScore = () => {
-    return { 
-        home: homeScore, 
-        away: awayScore,
-        homeLeadTime,
-        awayLeadTime,
-        leadChanges,
-        lastLeader,
-        ties };
-}
-
-const getScore = (req, res) => {
-    const score = currentScore();
-    res.json(score);
-};
-
-//viejo
-const postScore = (req, res) => {
-    const { team, points } = req.body;
-    if (team === 'home') {
-        if (points === -1 && homeScore > 0) {
-            homeScore += points;
-        } else {
-            homeScore += points;
-        }
-    } else if (team === 'away') {
-        if (points === -1 && awayScore > 0) {
-            awayScore += points;
-        } else {
-            awayScore += points;
-        }
-    }
-    // Actualizar tiempos de liderazgo
-    if (homeScore > awayScore) {
-        homeLeadTime += (remainingTimeActive() - startTime);
-        if (lastLeader !== 'home') {
-            leadChanges++;
-            lastLeader = 'home';
-        }
-    } else if (awayScore > homeScore) {
-        awayLeadTime += (remainingTimeActive() - startTime);
-        if (lastLeader !== 'away') {
-            leadChanges++;
-            lastLeader = 'away';
-        }
-    } else {
-        ties++;
-        lastLeader = lastLeader || 'empate';
-    }
-    startTime = remainingTimeActive();
-
-    res.json({ home: homeScore, away: awayScore });
-};
-
 //nuevo
 const updateScore = (currentGame, gameAction) => {
+    const actualLeader = getLastLeader(currentGame);
+
     let currentTeam = currentGame[gameAction.team];
     const newTeamScore = currentTeam.score + gameAction.data.points;
     currentTeam.score = newTeamScore
 
-    const home = (gameAction.team == 'HOME') ? currentTeam : currentGame.home;
-    const away = (gameAction.team == 'AWAY') ? currentTeam : currentGame.away;
-
-    const action = {
-        id: "generar_rnd",
-        type: gameAction.type,
-        team: gameAction.team,
-        time: gameAction.time,
-        events: []
-    }
+    const home = (gameAction.team == GAME_SETTINGS.TEAMS.HOME) ? currentTeam : currentGame.home;
+    const away = (gameAction.team == GAME_SETTINGS.TEAMS.AWAY) ? currentTeam : currentGame.away;
 
     let newGame = currentGame;
 
     newGame.home = home;
     newGame.away = away;
-    console.log(newGame);
+
+    const newLeader = getLastLeader(newGame);
+    
+    let events = [];
+
+    if (newLeader != actualLeader) {
+        const changeLeaderEvent = {
+            id: uuidv4(),
+            type: GAME_SETTINGS.LEADER.CHANGE_EVENT,
+            leader: newLeader
+        }
+
+        events.push(changeLeaderEvent);
+    }
+
+    const action = {
+        id: uuidv4(),
+        type: gameAction.type,
+        team: gameAction.team,
+        time: gameAction.time,
+        period: gameAction.period,
+        points: gameAction.data.points,
+        events: events
+    }
     newGame.actions.push(action);
+
 
     return newGame
 }
 
+const getLastLeader = (currentGame) => {
+    const homeScore = currentGame.home.score;
+    const awayScore = currentGame.away.score;
+
+    let leader = GAME_SETTINGS.LEADER.TIE;
+
+    if (homeScore > awayScore) {
+        leader = GAME_SETTINGS.TEAMS.HOME;
+    } else if (awayScore > homeScore) {
+        leader = GAME_SETTINGS.TEAMS.AWAY;
+    }
+
+    return leader;
+}
+
+const getLeaderData = (currentGame) => {
+    const changeLeaderActions = currentGame.actions
+        .filter((action) => 
+            action.events
+                .filter((e) =>
+                    e.type = GAME_SETTINGS.LEADER.CHANGE_EVENT
+                ).length > 0
+        ).flatMap((action) => {
+            const changeLeaderEvent = action.filter((e) => e.type = GAME_SETTINGS.LEADER.CHANGE_EVENT);
+            return {
+                ...action,
+                "leader": changeLeaderEvent.leader
+            }
+        });
+    
+    return getLeaderByTimeAndPeriods(changeLeaderActions);
+}
+
+function getLeaderByTimeAndPeriods(actions) {
+    const resultado = {};
+  
+    for (const { leader, time, period } of actions) {
+      if (!resultado[leader]) {
+        resultado[leader] = {};
+      }
+  
+      if (!resultado[leader][period]) {
+        resultado[leader][period] = 0;
+      }
+  
+      resultado[leader][period] += time;
+    }
+  
+    return resultado;
+  }
+
+
 
 module.exports = {
-    resetScore,
-    getScore,
-    postScore,
-    currentScore,
     updateScore,
-    homeScore,
-    awayScore
+    getLastLeader,
+    getLeaderData
 };
