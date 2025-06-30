@@ -1,0 +1,84 @@
+.board-output {
+  position: fixed;
+  inset: 0;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.board-overlay {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 25vh;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 950;
+}
+
+.board-container {
+  width: 100%;
+  max-width: 1280px;
+  aspect-ratio: 16 / 9;
+  padding: 20px;
+  background: #111;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(255,255,255,0.15);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Publicidad */
+.board-ads {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(#000, #111);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.ads-content {
+  text-align: center;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.ads-logo {
+  max-width: 180px;
+  margin-bottom: 20px;
+}
+
+.ads-message {
+  font-size: 2.2rem;
+  color: #0f62fe;
+  margin-bottom: 30px;
+}
+
+.ads-close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 26px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.ads-close:hover {
+  color: #0f62fe;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
